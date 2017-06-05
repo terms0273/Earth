@@ -1,0 +1,27 @@
+@(userList: List[models.Account])
+@import helper._
+
+@main("UserList") {
+    <div id="main" class="uk-margin-left uk-margin-right uk-padding">
+        <h2>UserList</h2>
+        <table class="uk-table uk-table-striped uk-table-hover">
+            <thead>
+                <tr>
+                    <th>UserID</th>
+                    <th>NickName</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for(user <- userList){
+                <tr>
+                    <td>@user.userName</td>
+                    <td>@user.fullName</td>
+                    <td><input type="button" value="Delete" onclick="location.href='./delete/@user.id'" class="uk-button"></td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        <input type="button" value="Back" onclick="location.href='/'" class="uk-button">
+    </div>
+}
