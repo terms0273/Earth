@@ -99,9 +99,26 @@
                         </table>
                       </div>
                     </div>
-                    <div id="map-contents">
-                      <div id="map"></div>
+                    <ul uk-tab>
+                      <li class="uk-active"><a href="#">Map</a></li>
+                      <li><a href="#">Graph</a></li>
+                      <li><a href="#">WeatherForecast</a></li>
+                    </ul>
+                    <div class="tab-contents uk-switcher uk-margin">
+                      <li>
+                        <div id="map-contents">
+                          <div id="map"></div>
+                        </div>
+                      </li>
+                      <li>
+                        <div id="graph"></div>
+                      </li>
+                      <li>
+                        <div id="weatherForecast"></div>
+                      </li>
                     </div>
+
+
                   </div>
               <script src="@routes.Assets.at("javascripts/main.js")" charset="UTF-8" type="text/javascript"></script>
             </div>
