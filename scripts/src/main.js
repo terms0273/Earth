@@ -6,16 +6,18 @@ import Graph from "./graph";
 $(function() {
     let weather = new Weather();
     let map = new Map();
-    let graph = new Graph();
 
     $("#search-city").click(updateWeather);
+    $("#tag-graph").click(() =>{
+      let graph = new Graph();
+      graph.send(weather.city);
+    });
     $("#input-city").keydown((e) =>{
         if(e.keyCode == 13){
             updateWeather();
         }
     });
     weather.send(weather.city);
-
     function updateWeather(){
         let newCity = $("#input-city").val();
         weather.send(newCity,map);
