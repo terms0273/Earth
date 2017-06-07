@@ -18,6 +18,7 @@ export default class OneDayWeatherForecast{
       }
     );
   }
+
   print(json){
     console.log(json);
 
@@ -49,49 +50,49 @@ export default class OneDayWeatherForecast{
       .domain([0,data.length])
       .range([180,540]);
 
-    var preRotated = translated.selectAll(".pre_rotated").data(data).enter()
-      .append("g")
-      .attr("class","pre_rotated");
+    var rotated = translated.selectAll("g").data(data).enter()
+      .append("g");
 
-    var circles = preRotated.append("image")
+    var image = rotated.append("image")
       .attr({
         x:0,
         y:0
       })
       .transition()
-        .delay(function(d,i){
+        .delay((d,i) => {
         return i * 50;
       })
       .duration(500)
       .ease("linear")
       .attr({
-        transform:function(d,i){ return "rotate(" + 360 + ")"; },
-        x:function(d,i){return Math.cos(r(i) * Math.PI / 180) * radius},
-        y:function(d,i){return Math.sin(r(i) * Math.PI / 180) * radius},
-        href: function(d,i){return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png"}
+        // transform:(d,i) => { return "rotate(" + 360 + ")"; },
+        x:(d,i) => {return Math.cos(r(i) * Math.PI / 180) * radius},
+        y:(d,i) => {return Math.sin(r(i) * Math.PI / 180) * radius},
+        href:(d) => {return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png"}
+      })
+      call((transition, callback) => {
+      	var n = 0;
+      	transition
+      		.each(function() { ++n; })
+      		.each("end", function() { if (!--n) callback.apply(this, arguments); });
       });
 
-      var circles = preRotated.append("text")
+      var text = rotated.append("text")
         .attr({
           x:0,
           y:0
         })
         .transition()
-          .delay(function(d,i){
+          .delay((d,i) => {
           return i * 50;
         })
         .duration(500)
         .ease("linear")
         .attr({
-          transform:function(d,i){ return "rotate(" + 360 + ")"; },
-          x:function(d,i){return Math.cos(r(i) * Math.PI / 180) * radius},
-          y:function(d,i){return Math.sin(r(i) * Math.PI / 180) * radius}
+          transform:(d,i) => { return "rotate(" + 360 + ")"; },
+          x:(d,i) => {return Math.cos(r(i) * Math.PI / 180) * radius},
+          y:(d,i) => {return Math.sin(r(i) * Math.PI / 180) * radius}
         })
-        .text(function(d){return new Date(d.dt * 1000).getHours() + ":00"});
-
-
-  }
-  rotate(){
-
+        .text((d) => {return new Date(d.dt * 1000).getHours() + ":00"});
   }
 }
