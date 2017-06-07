@@ -69,12 +69,6 @@ export default class OneDayWeatherForecast{
         x:(d,i) => {return Math.cos(r(i) * Math.PI / 180) * radius},
         y:(d,i) => {return Math.sin(r(i) * Math.PI / 180) * radius},
         href:(d) => {return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png"}
-      })
-      call((transition, callback) => {
-      	var n = 0;
-      	transition
-      		.each(function() { ++n; })
-      		.each("end", function() { if (!--n) callback.apply(this, arguments); });
       });
 
       var text = rotated.append("text")
