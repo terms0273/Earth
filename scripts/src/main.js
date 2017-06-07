@@ -9,7 +9,6 @@ $(function() {
 
   $("#search-city").click(updateWeather);
   $("#tab-weather-forecast").click(()=>{
-    d3.select("#one-day svg").remove();
     oneDay.init(weather.city);
   });
   $("#input-city").keydown((e) =>{

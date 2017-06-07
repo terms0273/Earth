@@ -4,6 +4,8 @@ export default class OneDayWeatherForecast{
   constructor(){}
 
   init(cityName){
+    d3.select("#one-day svg").remove();
+
     let url = "http://api.openweathermap.org/data/2.5/forecast?q=" +
     cityName +
     "&appid=9ab6492bf227782c3c7ae7417a624014";
