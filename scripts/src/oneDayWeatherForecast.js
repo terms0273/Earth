@@ -10,7 +10,7 @@ export default class OneDayWeatherForecast{
 
     //メンバー変数の初期化
     this.date = new Date();
-    this.date.setHours(3);
+    //this.date.setHours(3);
     this.sunrise = weather.sunrise;
     this.sunset = weather.sunset;
 
@@ -139,7 +139,7 @@ export default class OneDayWeatherForecast{
         fill:"orange"
       });
 
-
+  //TODO:日本以外の都市でバグることがある
   let riseMinutes = new Date(this.sunrise * 1000).getHours() * 60 + new Date(this.sunrise * 1000).getMinutes();
   let setMinutes = new Date(this.sunset * 1000).getHours() * 60 + new Date(this.sunset * 1000).getMinutes();
   let deyMinutes = 24 * 60;
