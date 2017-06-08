@@ -95,7 +95,25 @@ export default class OneDayWeatherForecast{
         }
       });
 
-    let nowIcon = translated.append("image")
+
+    let text = rotated.append("text")
+      .attr({
+        x:0,
+        y:0
+      })
+      .transition()
+      .delay((d,i) => {
+        return i * 50;
+      })
+      .duration(500)
+      .ease("linear")
+      .attr({
+        x:(d,i) => {return Math.cos(rScale(i) * Math.PI / 180) * radius},
+        y:(d,i) => {return Math.sin(rScale(i) * Math.PI / 180) * radius}
+      })
+      .text((d,i) => {return (i * 3 + 3  % 24) + ":00"});
+
+      let nowIcon = translated.append("image")
       .attr({
         x:0,
         y:0
@@ -114,23 +132,7 @@ export default class OneDayWeatherForecast{
           }
         }
       });
-
-    let text = rotated.append("text")
-      .attr({
-        x:0,
-        y:0
-      })
-      .transition()
-      .delay((d,i) => {
-        return i * 50;
-      })
-      .duration(500)
-      .ease("linear")
-      .attr({
-        x:(d,i) => {return Math.cos(rScale(i) * Math.PI / 180) * radius},
-        y:(d,i) => {return Math.sin(rScale(i) * Math.PI / 180) * radius}
-      })
-      .text((d,i) => {return (i * 3 + 3  % 24) + ":00"});
+    //let center = translated.append(c)
   }
 
   isSun(){
