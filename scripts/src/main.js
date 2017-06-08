@@ -9,7 +9,9 @@ $(function() {
 
   $("#search-city").click(updateWeather);
   $("#tab-weather-forecast").click(()=>{
-    oneDay.init(weather.city);
+    if($("#tab-weather-forecast").parent().attr("aria-expanded") === "false"){
+      oneDay.init(weather);
+    }
   });
   $("#input-city").keydown((e) =>{
     if(e.keyCode == 13){
