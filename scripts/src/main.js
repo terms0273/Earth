@@ -7,10 +7,14 @@ $(function() {
   let map = new Map();
   let oneDay = new OneDayWeatherForecast();
 
+  weather.send(weather.city);
+  setTimeout(()=>{oneDay.init(weather);}, 200);
+
   $("#search-city").click(updateWeather);
   $("#tab-weather-forecast").click(()=>{
     if($("#tab-weather-forecast").parent().attr("aria-expanded") === "false"){
-      oneDay.init(weather);
+      d3.select("svg").remove();
+      oneDay.print();
     }
   });
   $("#input-city").keydown((e) =>{
@@ -18,7 +22,6 @@ $(function() {
       updateWeather();
     }
   });
-  weather.send(weather.city);
 
   function updateWeather(){
     let newCity = $("#input-city").val();
