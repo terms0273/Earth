@@ -23,8 +23,6 @@ $(function() {
   function updateWeather(){
     let newCity = $("#input-city").val();
     weather.send(newCity,map);
+    setTimeout(()=>{oneDay.init(weather);}, 500);
   }
-
-
-
 });
