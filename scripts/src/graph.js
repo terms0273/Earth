@@ -154,9 +154,9 @@ export default class Graph{
       let d3line = d3.svg.line()
         .x(function(d){return xScale(d.dt);})
         .y(function(d){
-          let v = Math.pow(d.wind.speed, 0.75);
+          let v = Math.pow(d.wind.speed, 0.75);//風速を0.75乗
           let a = 1.76 + 1.4*v;
-          return yScale(37-(37-(d.main.temp-273.15))/(0.68 - (0.0014)*(d.main.humidity) + (1/a)));
+          return yScale(37-(37-(d.main.temp-273.15))/(0.68 - (0.0014)*(d.main.humidity) + (1/a)));//体感温度の計算式
         })
         .interpolate("cardinal");
 
