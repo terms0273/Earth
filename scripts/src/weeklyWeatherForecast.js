@@ -49,12 +49,12 @@ export default class WeeklyWeatherForecast {
     weekday[6] = "Sat";
 
     //表の行名表示テキスト用配列
-    let indexData = [];
+    let rowTitleData = [];
 
-    indexData[0] = "DATE";
-    indexData[1] = "WEATHER";
-    indexData[2] = "MAX";
-    indexData[3] = "MIN";
+    rowTitleData[0] = "DATE";
+    rowTitleData[1] = "WEATHER";
+    rowTitleData[2] = "MAX";
+    rowTitleData[3] = "MIN";
 
     //表の行位置用配列
     let yPoint = [];
@@ -71,30 +71,32 @@ export default class WeeklyWeatherForecast {
       dataset[i] = this.json.list[i];
     }
 
-    let xscale = d3.scale.linear()
+    let xScale = d3.scale.linear()
       .domain([0,dataset.length])
       .range([padding,w-padding]);
 
-    let weekly = svg.append("g").selectAll("g")
-      .data(dataset)
-      .enter();
-
-    let index = svg.append("g").selectAll("g")
-      .data(indexData)
-      .enter()
-      .append("text");
+    //表の行名表示用グループ作成
+    let rowTitle = svg.append("g").selectAll("g")
+    .data(rowTitleData)
+    .enter()
+    .append("text");
 
     //表の行名表示
-    index.attr({
+    rowTitle.attr({
         x: 0,
         y: function(d,i) {return yPoint[i];}
       })
       .text(function(d) {return d;});
 
-    //日付表示
+    //週間天気予報表示用グループ作成
+    let weekly = svg.append("g").selectAll("g")
+    .data(dataset)
+    .enter();
+
+    //週間天気予報の日付表示
     weekly.append("text")
       .attr({
-        x: function(d,i){return xscale(i) + 70;},
+        x: function(d,i){return xScale(i) + 70;},
         y: function() {return yPoint[0];}
       })
       .text(function(d) {
@@ -104,7 +106,7 @@ export default class WeeklyWeatherForecast {
         "(" + weekday[date.getDay()] + ")";
       });
 
-    //天気アイコン表示
+    //週間天気予報の天気アイコン表示
     weekly.append("image")
       //on click 未実装
       .on("click", function(d,i) {
@@ -125,24 +127,24 @@ export default class WeeklyWeatherForecast {
         href: function(d){
           return 'http://openweathermap.org/img/w/'+d.weather[0].icon+'.png';
         },
-        x: function(d,i){return xscale(i) + 70;},
+        x: function(d,i){return xScale(i) + 70;},
         y: function() {return yPoint[1];}
       });
 
-    //最高気温表示
+    //週間天気予報の最高気温表示
     weekly.append("text")
       .attr({
-        x: function(d,i){return xscale(i) + 85;},
+        x: function(d,i){return xScale(i) + 85;},
         y: function() {return yPoint[2];}
       })
       .text(function(d) {
         return Math.round(d.temp.max - 273.15);
       });
 
-    //最低気温表示
+    //週間天気予報の最低気温表示
     weekly.append("text")
       .attr({
-        x: function(d,i){return xscale(i) + 85;},
+        x: function(d,i){return xScale(i) + 85;},
         y: function() {return yPoint[3];}
       })
       .text(function(d) {
