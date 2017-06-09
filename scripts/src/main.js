@@ -23,7 +23,8 @@ $(function() {
 
   $("#tab-weather-forecast").click(() =>{
     if($("#tab-weather-forecast").parent().attr("aria-expanded") === "false"){
-      weekly.init(weather.city);
+      d3.select("svg").remove();
+      weekly.print();
     }
   });
 });

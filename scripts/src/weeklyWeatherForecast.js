@@ -2,13 +2,13 @@ import * as d3 from "d3";
 
 export default class WeeklyWeatherForecast {
   constructor() {
-
+    this.init("Tokyo");
   }
 
-  print(json) {
+  print() {
     let w = 850;
-    let h = 200;
-    let padding = 20;
+    let h = 700;
+    let padding = 25;
 
     let weekday = [];
 
@@ -37,8 +37,8 @@ export default class WeeklyWeatherForecast {
     let svg = d3.select("#weekly").append("svg").attr({width:w, height:h});
 
     let dataset = [];
-    for (let i = 0; i < json.list.length; i++) {
-      dataset[i] = json.list[i];
+    for (let i = 0; i < this.json.list.length; i++) {
+      dataset[i] = this.json.list[i];
     }
 
     let xscale = d3.scale.linear()
@@ -73,6 +73,20 @@ export default class WeeklyWeatherForecast {
     });
 
     weekly.append("image")
+    .on("click", function(d,i) {
+
+    })
+    .transition()
+    .duration(1000)
+    .delay(function(d, i) {
+      return i * 200;
+    })
+    .each("start", function() {
+      d3.select(this).attr({
+        x: 1000,
+        y: function() {return yPoint[1];}
+      });
+    })
     .attr({
       href: function(d){
         return 'http://openweathermap.org/img/w/'+d.weather[0].icon+'.png';
@@ -110,7 +124,8 @@ export default class WeeklyWeatherForecast {
       url:url
     }).then((json) =>{
       console.log(json);
-      this.print(json);
+      this.json = json;
+      this.print();
     },(err) =>{
       console.log(err);
     });
