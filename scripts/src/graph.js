@@ -26,38 +26,38 @@ export default class Graph{
   //jsonから正しくデータが受け取れているときに呼ばれるメソッド
   print(json){
     //jsonからリストを受け取る
-    var forecastlist = json.list;
+    let forecastlist = json.list;
     //画面レイアウトの設定
-    var margin = {top: 20, right: 20, bottom: 30, left: 40};
-    var w = 1000 - margin.left - margin.right;
-    var h = 700 - margin.top - margin.bottom;
-    var padding = 20;
+    let margin = {top: 20, right: 20, bottom: 30, left: 40};
+    let w = 1000 - margin.left - margin.right;
+    let h = 700 - margin.top - margin.bottom;
+    let padding = 20;
 
     //スケール関数でグラフ表示の範囲を決める
-    var xScale = d3.scale.linear()
+    let xScale = d3.scale.linear()
       .domain([forecastlist[0].dt, forecastlist[forecastlist.length-1].dt])
       .range([padding, w-margin.left]);
 
-    var yScale = d3.scale.linear()
+    let yScale = d3.scale.linear()
       .domain([0, 100])
       .range([h-padding, padding]);
 
     //svg領域を確保
-    var svg = d3.select("#graph")
+    let svg = d3.select("#graph")
       .append("svg")
       .attr("width", w)
       .attr("height", h)
       .append("g");
 
     //縦軸と横軸の設定
-    var xAxis = d3.svg.axis()
+    let xAxis = d3.svg.axis()
       .scale(xScale)
       .orient("bottom")
       .tickFormat(function(d){
-          var date = new Date(d * 1000);
+          let date = new Date(d * 1000);
           return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getHours() + " :00";
         });
-    var yAxis = d3.svg.axis()
+    let yAxis = d3.svg.axis()
       .scale(yScale)
       .orient("left");
 
@@ -66,12 +66,12 @@ export default class Graph{
       .attr({
         class:"x axis",
         transform: "translate(0, 630)"})
-        .call(xAxis);
+      .call(xAxis);
 　  svg.append("g")
       .attr({
         class:"y axis",
         transform: "translate(20, 0)"})
-        .call(yAxis);
+      .call(yAxis);
 
     /*ここまではグラフの共通部分
     ここから4つのグラフにチェックボックスのチェック有無で分岐
@@ -80,7 +80,7 @@ export default class Graph{
     //気温チェック
     if($("#chkTemp:checked").val()){
       //lineメソッドで線を用意している
-      var d3line = d3.svg.line()
+      let d3line = d3.svg.line()
         .x(function(d){return xScale(d.dt);})
         .y(function(d){return yScale(d.main.temp - 273.15);})
         .interpolate("cardinal");//線の種類。cardinalは曲線
@@ -95,14 +95,14 @@ export default class Graph{
         .style("fill", "none");
 
       //気温を示す点を描画
-      var circle = svg.selectAll("circle")
+      let circle = svg.selectAll("circle")
         .data(forecastlist)
         .enter()
         .append("circle")
         .attr({
           'cx': function(d){return xScale(d.dt);},
-          'cy': function(d){return 0;},
-          'r': function(d) { return 2; },
+          'cy': 0,
+          'r': 2,
           transform: "translate(0, 0)"
         });
       //点が上から降ってきてバウンドするアニメーション
@@ -117,7 +117,7 @@ export default class Graph{
 
     //湿度チェック
     if($("#chkHumide:checked").val()){
-      var d3line = d3.svg.line()
+      let d3line = d3.svg.line()
         .x(function(d){return xScale(d.dt);})
         .y(function(d){return yScale(d.main.humidity);})
         .interpolate("cardinal");
@@ -131,14 +131,14 @@ export default class Graph{
         .style("fill", "none");
 
 
-      var circle = svg.selectAll("circle2")
+      let circle = svg.selectAll("circle2")
         .data(forecastlist)
         .enter()
         .append("circle")
         .attr({
           'cx': function(d){return xScale(d.dt);},
-          'cy': function(d){return 0;},
-          'r': function(d) { return 2; },
+          'cy': 0,
+          'r': 2,
           transform: "translate(0, 0)"
         });
 
@@ -149,14 +149,13 @@ export default class Graph{
         .attr("cy", function(d){return yScale(d.main.humidity);});
     }
 
-
     //体感温度チェック
     if($("#chkTaikan:checked").val()){
-      var d3line = d3.svg.line()
+      let d3line = d3.svg.line()
         .x(function(d){return xScale(d.dt);})
         .y(function(d){
-          var v = Math.pow(d.wind.speed, 0.75);
-          var a = 1.76 + 1.4*v;
+          let v = Math.pow(d.wind.speed, 0.75);
+          let a = 1.76 + 1.4*v;
           return yScale(37-(37-(d.main.temp-273.15))/(0.68 - (0.0014)*(d.main.humidity) + (1/a)));
         })
         .interpolate("cardinal");
@@ -169,14 +168,14 @@ export default class Graph{
         .style("stroke", "ff6699")
         .style("fill", "none");
 
-      var circle = svg.selectAll("circle3")
+      let circle = svg.selectAll("circle3")
         .data(forecastlist)
         .enter()
         .append("circle")
         .attr({
           'cx': function(d){return xScale(d.dt);},
-          'cy': function(d){return 0;},
-          'r': function(d) { return 2; },
+          'cy': 0,
+          'r':2,
           transform: "translate(0, 0)"
         });
 
@@ -185,15 +184,15 @@ export default class Graph{
         .duration(1000)
         .ease("bounce")
         .attr("cy", function(d){
-          var v = Math.pow(d.wind.speed, 0.75);
-          var a = 1.76 + 1.4*v;
+          let v = Math.pow(d.wind.speed, 0.75);
+          let a = 1.76 + 1.4*v;
           return yScale(37-(37-(d.main.temp-273.15))/(0.68 - (0.0014)*(d.main.humidity) + (1/a)));
         });
     }
 
     //不快指数チェック
     if($("#chkFukai:checked").val()){
-      var d3line = d3.svg.line()
+      let d3line = d3.svg.line()
         .x(function(d){return xScale(d.dt);})
         .y(function(d){
           return yScale(0.81*(d.main.temp - 273.15) + 0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3)+46.3);
@@ -210,14 +209,14 @@ export default class Graph{
         .style("fill", "none");
 
 
-      var circle = svg.selectAll("circle4")
+      let circle = svg.selectAll("circle4")
         .data(forecastlist)
         .enter()
         .append("circle")
         .attr({
           'cx': function(d){return xScale(d.dt);},
-          'cy': function(d){return 0;},
-          'r': function(d) { return 2; },
+          'cy': 0,
+          'r': 2,
           transform: "translate(0, 0)"
         });
 
@@ -226,13 +225,12 @@ export default class Graph{
         .duration(1000)
         .ease("bounce")
         .attr("cy", function(d){
-          var v = Math.pow(d.wind.speed, 0.75);
-          var a = 1.76 + 1.4*v;
+          let v = Math.pow(d.wind.speed, 0.75);
+          let a = 1.76 + 1.4*v;
           return yScale(0.81*(d.main.temp - 273.15) + 0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3);
         });
     }
   }
-
 
   //サークルとグラフ線を消すだけのメソッド
   hideGraph(){
