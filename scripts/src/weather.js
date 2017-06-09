@@ -4,7 +4,12 @@ export default class Weather{
     }
     print(json){
         this.city = json.name;
-        $("#city-name").html("<img src='/assets/images/flag/"+json.sys.country.toLowerCase()+".png'>" + this.city);
+        if(typeof json.sys.country !== "undefined"){
+          $("#city-name").html("<img src='/assets/images/flag/"+json.sys.country.toLowerCase()+".png'>" + this.city);
+        }else{
+          //画像が見つからない
+          $("#city-name").html(this.city);
+        }
         $("#weather").text(json.weather[0].main);
         $("#icon").html("<img src='http://openweathermap.org/img/w/"+json.weather[0].icon+".png'>");
         let num = Number(json.main.temp - 273 );
