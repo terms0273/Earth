@@ -13,10 +13,12 @@ export default class Weather{
         $("#cloud").text("空全体の"+json.clouds.all+"%が雲");
         $("#pressure").text(json.main.pressure + "hPa");
         $("#humidity").text(json.main.humidity + "%");//湿度％
-        let sunrise = new Date(json.sys.sunrise * 1000);
-        $("#sunrise").text(sunrise);
-        let sunset = new Date(json.sys.sunset * 1000);
-        $("#sunset").text(sunset);
+
+        this.sunrise = json.sys.sunrise;
+        $("#sunrise").text(new Date(this.sunrise * 1000));
+
+        this.sunset = json.sys.sunset;
+        $("#sunset").text(new Date(this.sunset * 1000));
 
         this.lat = json.coord.lat;
         this.lon = json.coord.lon;
