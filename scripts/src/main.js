@@ -1,6 +1,6 @@
 import Weather from "./weather";
 import Map from "./map";
-
+import WeeklyWeatherForecast from "./weeklyWeatherForecast";
 import Graph from "./graph";
 import OneDayWeatherForecast from "./oneDayWeatherForecast";
 
@@ -9,6 +9,7 @@ $(function() {
   let map = new Map();
   let graph = new Graph();
   let oneDay = new OneDayWeatherForecast();
+  let weekly = new WeeklyWeatherForecast();
 
   //検索ボタン押したときに呼ぶ
   $("#search-city").click(updateWeather);
@@ -17,6 +18,7 @@ $(function() {
     if($("#tab-weather-forecast").parent().attr("aria-expanded") === "false"){
       d3.select("svg").remove();
       oneDay.print();
+      weekly.print();
     }
   });
   //チェックボックスにチェック
@@ -38,17 +40,7 @@ $(function() {
     let newCity = $("#input-city").val();
     weather.send(newCity,map);
     setTimeout(function(){graph.init(weather.city)}, 500);
-  };
-
-  $("#input-city").keydown((e) =>{
-    if(e.keyCode == 13){
-      updateWeather();
-    }
-  });
-
-  function updateWeather(){
-    let newCity = $("#input-city").val();
-    weather.send(newCity,map);
+    setTimeout(()=>{weekly.init(weather.city);}, 500);
     setTimeout(()=>{oneDay.init(weather);}, 500);
-  }
+  };
 });
