@@ -16,7 +16,8 @@ $(function() {
 
   $("#tab-weather-forecast").click(()=>{
     if($("#tab-weather-forecast").parent().attr("aria-expanded") === "false"){
-      d3.select("svg").remove();
+      d3.select("#one-day > svg").remove();
+      d3.select("#weekly > svg").remove();
       oneDay.print();
       weekly.print();
     }

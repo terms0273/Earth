@@ -41,7 +41,7 @@ export default class OneDayWeatherForecast{
   print(){
 
     let width = 760;
-    let height = 600;
+    let height = 350;
     let radius = 100;
     let margin = 50;
 
