@@ -3,12 +3,17 @@ import * as d3 from "d3";
 export default class OneDayWeatherForecast{
   constructor(){}
 
+  /**
+   *jsonを新しく持ってくる
+   *そしてprint()を呼び出す
+   */
   init(weather){
 
     d3.select("#one-day svg").remove();
 
     //メンバー変数の初期化
     this.date = new Date();
+    //現在の日付の時間を変更する デバッグ用コメント
     //this.date.setHours(3);
     this.sunrise = weather.sunrise;
     this.sunset = weather.sunset;
@@ -19,6 +24,7 @@ export default class OneDayWeatherForecast{
     $.ajax({
       url:url
     }).then((json) =>{
+      console.log(json);
       this.json = json;
       this.print();  //成功時
     },
@@ -28,6 +34,9 @@ export default class OneDayWeatherForecast{
     );
   }
 
+  /**
+   *1日の詳細の天気予報を表示する
+   */
   print(){
 
     let width = 760;
@@ -86,7 +95,7 @@ export default class OneDayWeatherForecast{
         y:(d,i) => {return Math.sin(rScale(i) * Math.PI / 180) * radius},
         href:(d) => {
           if(d === null){
-            return "/assets/images/finished-icon.png"
+            return "/assets/images/finished-icon.png";
           }else{
             return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png";
           }
@@ -117,7 +126,7 @@ export default class OneDayWeatherForecast{
           return Math.sin(rScale(i) * Math.PI / 180) * (radius + 40) + 30;
         }
       })
-      .text((d,i) => {return (i * 3 + 3  % 24) + ":00"});
+      .text((d,i) => {return (i * 3 + 3  % 24) + ":00";});
 
     //現在の太陽or月を表示する
     let nowIcon = translated.append("image")
@@ -172,11 +181,11 @@ export default class OneDayWeatherForecast{
       .range([180,540]);
 
     //合計値を算出する上でのラムダ．
-    let actGettingScore = function(d){return d.score};
+    let actGettingScore = function(d){return d.score;};
     //arcオブジェクトは扇形に相当するd操作を生成する．
     let arc = d3.svg.arc()
       .startAngle(function(d){return 0;})
-      .endAngle(function(d){return Math.PI * 2 * d.score/ deySecond; })
+      .endAngle(function(d){return Math.PI * 2 * d.score/ deySecond;})
       .innerRadius(function(d){return 20;})
       .outerRadius(function(d){return radius + 20;});
 
@@ -198,7 +207,12 @@ export default class OneDayWeatherForecast{
         d: (d,i) => {return arc(d);},
         transform: (d,i) => {
           //累計値を計算して，回転角に変換する．
-          let subArr = i == 0 ? []: dataArr.slice(0, i);
+          let subArr = i;
+          if(i == 0){
+            subArr = [];
+          }else{
+            subArr = dataArr.slice(0, i);
+          }
           return "translate(25,25),rotate("
                     + 360 * d3.sum(subArr, actGettingScore) / deySecond +
                  "),rotate("
@@ -210,6 +224,9 @@ export default class OneDayWeatherForecast{
       });
   }
 
+  /*
+   *太陽か月かを判断する
+   */
   isSun(){
     let dt = this.date.getTime() / 1000;
     if(this.sunrise <= dt && dt <= this.sunset){
