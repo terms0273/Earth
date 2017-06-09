@@ -9,7 +9,6 @@ export default class WeeklyWeatherForecast {
    * 一週間の天気データ取得
    * print()の呼び出し
    * @param  cityName
-   * @return
    */
   init(cityName) {
     d3.select("svg").remove();
@@ -30,7 +29,6 @@ export default class WeeklyWeatherForecast {
 
   /**
    * 週間天気予報表示
-   * @return
    */
   print() {
     let w = 850;
@@ -38,15 +36,15 @@ export default class WeeklyWeatherForecast {
     let padding = 25;
 
     //曜日表示用配列
-    let weekday = [];
+    let day = [];
 
-    weekday[0] = "Sun";
-    weekday[1] = "Mon";
-    weekday[2] = "Tue";
-    weekday[3] = "Wed";
-    weekday[4] = "Thu";
-    weekday[5] = "Fri";
-    weekday[6] = "Sat";
+    day[0] = "Sun";
+    day[1] = "Mon";
+    day[2] = "Tue";
+    day[3] = "Wed";
+    day[4] = "Thu";
+    day[5] = "Fri";
+    day[6] = "Sat";
 
     //表の行名表示テキスト用配列
     let rowTitleData = [];
@@ -77,9 +75,9 @@ export default class WeeklyWeatherForecast {
 
     //表の行名表示用グループ作成
     let rowTitle = svg.append("g").selectAll("g")
-    .data(rowTitleData)
-    .enter()
-    .append("text");
+      .data(rowTitleData)
+      .enter()
+      .append("text");
 
     //表の行名表示
     rowTitle.attr({
@@ -90,8 +88,8 @@ export default class WeeklyWeatherForecast {
 
     //週間天気予報表示用グループ作成
     let weekly = svg.append("g").selectAll("g")
-    .data(dataset)
-    .enter();
+      .data(dataset)
+      .enter();
 
     //週間天気予報の日付表示
     weekly.append("text")
@@ -102,8 +100,8 @@ export default class WeeklyWeatherForecast {
       .text(function(d) {
         let date = new Date(d.dt * 1000);
         return (date.getMonth() + 1) + "/" +
-        date.getDate() +
-        "(" + weekday[date.getDay()] + ")";
+                date.getDate() +
+                "(" + day[date.getDay()] + ")";
       });
 
     //週間天気予報の天気アイコン表示
@@ -138,7 +136,7 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[2];}
       })
       .text(function(d) {
-        return Math.round(d.temp.max - 273.15);
+        return new Number(d.temp.max - 273.15).toFixed(1);
       });
 
     //週間天気予報の最低気温表示
@@ -148,7 +146,7 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[3];}
       })
       .text(function(d) {
-        return Math.round(d.temp.min - 273.15);
+        return new Number(d.temp.min - 273.15).toFixed(1);
       });
   }
 }

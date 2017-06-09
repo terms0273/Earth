@@ -15,10 +15,10 @@ $(function() {
   });
   weather.send(weather.city);
 
-    let newCity = $("#input-city").val();
-    function updateWeather(){
+  let newCity = $("#input-city").val();
+  function updateWeather(){
     weather.send(newCity,map);
-    setTimeout(()=>{weekly.init(weather.city);}, 500);
+  setTimeout(()=>{weekly.init(weather.city);}, 500);
   }
 
   $("#tab-weather-forecast").click(() =>{
