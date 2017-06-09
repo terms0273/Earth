@@ -14,10 +14,10 @@ export default class Weather{
         $("#pressure").text(json.main.pressure + "hPa");
         $("#humidity").text(json.main.humidity + "%");//湿度％
 
-        this.sunrise = json.sys.sunrise
+        this.sunrise = json.sys.sunrise;
         $("#sunrise").text(new Date(this.sunrise * 1000));
 
-        this.sunset = json.sys.sunset
+        this.sunset = json.sys.sunset;
         $("#sunset").text(new Date(this.sunset * 1000));
 
         this.lat = json.coord.lat;

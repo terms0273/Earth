@@ -84,7 +84,7 @@ export default class OneDayWeatherForecast{
         y:(d,i) => {return Math.sin(rScale(i) * Math.PI / 180) * radius},
         href:(d) => {
           if(d === null){
-            return "http://openweathermap.org/img/w/03n.png" //TODO:過ぎた予報のイメージ画像
+            return "/assets/images/finished-icon.png" //TODO:過ぎた予報のイメージ画像
           }else{
             return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png";
           }
@@ -112,7 +112,7 @@ export default class OneDayWeatherForecast{
       })
       .text((d,i) => {return (i * 3 + 3  % 24) + ":00"});
 
-      let nowIcon = translated.append("image")
+    let nowIcon = translated.append("image")
       .attr({
         x:0,
         y:0
@@ -139,52 +139,54 @@ export default class OneDayWeatherForecast{
         fill:"orange"
       });
 
-  //TODO:日本以外の都市でバグることがある
-  let riseMinutes = new Date(this.sunrise * 1000).getHours() * 60 + new Date(this.sunrise * 1000).getMinutes();
-  let setMinutes = new Date(this.sunset * 1000).getHours() * 60 + new Date(this.sunset * 1000).getMinutes();
-  let deyMinutes = 24 * 60;
-  var dataArr = [
-     {score: setMinutes - riseMinutes},
-     {score: deyMinutes - (setMinutes - riseMinutes)}
- ];
-  var colors = [
-    "rgba(255, 0, 0, 0.1)",
-    "rgba(0, 0, 255, 0.1)"
-  ];
-  let riseScale = d3.scale.linear()
-    .domain([0,deyMinutes])
-    .range([180,540]);
+    //TODO:日本以外の都市でバグることがある
+    let risedt =this.sunrise;
+    let setdt = this.sunset;
+    let deySecond = 24 * 60 * 60;
+    var dataArr = [
+       {score: setdt - risedt},
+       {score: deySecond - (setdt - risedt)}
+    ];
+    var colors = [
+      "255, 0, 0",
+      "0, 0, 255"
+    ];
+    let riseScale = d3.scale.linear()
+      .domain([0,deySecond])
+      .range([180,540]);
 
- //合計値を算出する上でのラムダ．
- var actGettingScore = function(d){return d.score};
- //arcオブジェクトは扇形に相当するd操作を生成する．
- var arc = d3.svg.arc()
-     .startAngle(function(d){return 0;})
-     .endAngle(function(d){return Math.PI * 2 * d.score/ deyMinutes; })
-     .innerRadius(function(d){return 20;})
-     .outerRadius(function(d){return radius + 20;});
-var circleGraph = translated.append("g");
- circleGraph.selectAll("path")
-     .data(dataArr)
-     .enter()
-     .append("path")
-     .attr({
+    //合計値を算出する上でのラムダ．
+    var actGettingScore = function(d){return d.score};
+    //arcオブジェクトは扇形に相当するd操作を生成する．
+    var arc = d3.svg.arc()
+      .startAngle(function(d){return 0;})
+      .endAngle(function(d){return Math.PI * 2 * d.score/ deySecond; })
+      .innerRadius(function(d){return 20;})
+      .outerRadius(function(d){return radius + 20;});
 
-     })
-     .transition()
-     .duration(500)
-     .ease("linear")
-     .attr({
-       d: (d,i) => {return arc(d)},
-       transform: (d,i) => {
-           //累計値を計算して，回転角に変換する．
-           var subArr = i == 0 ? []: dataArr.slice(0, i);
-           return "translate(25,25),rotate(" + 360 * d3.sum(subArr, actGettingScore)/deyMinutes + "),rotate("+riseScale(riseMinutes)+")"
-       },
-       stroke: "white",
-       fill: (d,i) => {return colors[i]}
-     });
-
+    let temp = new Date(risedt * 1000);
+    let riseSecond = temp.getHours() * 3600 + temp.getMinutes() * 60 + temp.getSeconds();
+    var circleGraph = translated.append("g");
+    circleGraph.selectAll("path")
+      .data(dataArr)
+      .enter()
+      .append("path")
+      .attr({
+        fill: (d,i) => {return "rgba("+colors[i]+", 0.0)"}
+      })
+      .transition()
+      .duration(500)
+      .ease("linear")
+      .attr({
+        d: (d,i) => {return arc(d)},
+        transform: (d,i) => {
+          //累計値を計算して，回転角に変換する．
+          var subArr = i == 0 ? []: dataArr.slice(0, i);
+        return "translate(25,25),rotate(" + 360 * d3.sum(subArr, actGettingScore)/deySecond + "),rotate("+riseScale(riseSecond)+")"
+        },
+        stroke: "white",
+        fill: (d,i) => {return "rgba("+colors[i]+", 0.1)"}
+      });
   }
 
   isSun(){
