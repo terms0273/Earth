@@ -24,9 +24,10 @@ export default class OneDayWeatherForecast{
     $.ajax({
       url:url
     }).then((json) =>{
+      //成功したときの処理
       console.log(json);
       this.json = json;
-      this.print();  //成功時
+      this.print();
     },
       (err) =>{
         console.log(err);
@@ -140,11 +141,11 @@ export default class OneDayWeatherForecast{
       .attr({
         x:() => {
           return Math.cos(nowScale(this.date.getHours()) * Math.PI / 180)
-            * (radius - 50);
+                 * (radius - 50);
         },
         y:() => {
           return Math.sin(nowScale(this.date.getHours()) * Math.PI / 180)
-            * (radius - 50);
+                 * (radius - 50);
         },
         href: () => {
           if(this.isSun()){
