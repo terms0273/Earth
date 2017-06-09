@@ -100,7 +100,7 @@
                       </div>
                     </div>
                     <ul uk-tab>
-                      <li class="uk-active"><a href="#">Map</a></li>
+                      <li class="uk-active"><a href="#">Map</a></li>               
                       <li><a id="tab-graph" href="#">Graph</a></li>
                       <li><a id="tab-weather-forecast"href="#">Weather Forecast</a></li>
                     </ul>
@@ -111,7 +111,14 @@
                         </div>
                       </li>
                       <li>
-                        <div id="graph"></div>
+                        <div id="graph">
+                          <form id="slctGraph">
+                            <input id="chkTemp" type="checkbox" name="temp" value="1">Temperature
+                            <input id="chkHumide" type="checkbox" name="humide" value="2" >Humidity
+                            <input id="chkTaikan" type="checkbox" name="degree" value="3" >体感温度
+                            <input id="chkFukai" type="checkbox" name="index" value="4" >不快指数
+                          </form>
+                        </div>
                       </li>
                       <li>
                         <div id="weather-forecast">
