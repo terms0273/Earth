@@ -11,12 +11,6 @@ $(function() {
     //検索ボタン押したときに呼ぶ
     $("#search-city").click(updateWeather);
 
-    //グラフボタン押したとき展開
-    $("#tag-graph").click(() =>{
-      if($("#tag-graph").parent().attr("aria-expanded") === "false"){
-        ;
-      }
-    });
 
     //チェックボックスにチェック
     $(":checkbox").click(()=>{

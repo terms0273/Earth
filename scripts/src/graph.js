@@ -13,13 +13,13 @@ export default class Graph{
     "&appid=9ab6492bf227782c3c7ae7417a624014";
 
     $.ajax({
-        url:url
+      url:url
     }).then((json) =>{
-        //jsonが正しく受け取れているとき
-        console.log(json);
-        this.print(json);//下でprintメソッドを定義している
+      //jsonが正しく受け取れているとき
+      console.log(json);
+      this.print(json);//下でprintメソッドを定義している
     },(err) =>{
-        console.log(err);
+      console.log(err);
     });
   }
 
@@ -35,12 +35,12 @@ export default class Graph{
 
     //スケール関数でグラフ表示の範囲を決める
     var xScale = d3.scale.linear()
-                    .domain([forecastlist[0].dt, forecastlist[forecastlist.length-1].dt])
-                    .range([padding, w-margin.left]);
+      .domain([forecastlist[0].dt, forecastlist[forecastlist.length-1].dt])
+      .range([padding, w-margin.left]);
 
     var yScale = d3.scale.linear()
-                    .domain([0, 100])
-                    .range([h-padding, padding]);
+      .domain([0, 100])
+      .range([h-padding, padding]);
 
     //svg領域を確保
     var svg = d3.select("#graph")
