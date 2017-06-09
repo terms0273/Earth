@@ -63,7 +63,7 @@ export default class Graph{
         .attr({
           transform: "translate(0, 0)"})
         .style("stroke-width", 2)
-        .style("stroke", "steelblue")
+        .style("stroke", "#ff00ff")
         .style("fill", "none");
 
 
@@ -74,10 +74,16 @@ export default class Graph{
        .attr({
          // enterに入っているデータ一つ一つで下の処理を行う
          'cx': function(d){return xScale(d.dt);},
-         'cy': function(d){return yScale(d.main.temp - 273.15);},
+         'cy': function(d){return 0;},
          'r': function(d) { return 2; },
          transform: "translate(0, 0)"
        });
+
+       circle.transition()
+        .delay(400)
+        .duration(1000)
+        .ease("bounce")
+        .attr("cy", function(d){return yScale(d.main.temp-273.15);});
     }
 
 
@@ -94,7 +100,7 @@ export default class Graph{
         .attr({
           transform: "translate(0, 0)"})
         .style("stroke-width", 2)
-        .style("stroke", "steelblue")
+        .style("stroke", "#313198")
         .style("fill", "none");
 
 
@@ -105,11 +111,18 @@ export default class Graph{
        .attr({
          // enterに入っているデータ一つ一つで下の処理を行う
          'cx': function(d){return xScale(d.dt);},
-         'cy': function(d){return yScale(d.main.humidity);},
+         'cy': function(d){return 0;},
          'r': function(d) { return 2; },
          transform: "translate(0, 0)"
        });
+
+       circle.transition()
+        .delay(400)
+        .duration(1000)
+        .ease("bounce")
+        .attr("cy", function(d){return yScale(d.main.humidity);});
     }
+
 
     //体感温度チェック
     if($("#chkTaikan:checked").val()){
@@ -129,8 +142,8 @@ export default class Graph{
         .attr("d", d3line(forecastlist))
         .attr({
           transform: "translate(0, 0)"})
-        .style("stroke-width", 2)
-        .style("stroke", "steelblue")
+        .style("stroke-width", 3)
+        .style("stroke", "ff6699")
         .style("fill", "none");
 
 
@@ -141,14 +154,20 @@ export default class Graph{
        .attr({
          // enterに入っているデータ一つ一つで下の処理を行う
          'cx': function(d){return xScale(d.dt);},
-         'cy': function(d){
-           var v = Math.pow(d.wind.speed, 0.75);
-           var a = 1.76 + 1.4*v;
-           return yScale(37-(37-(d.main.temp-273.15))/(0.68 - (0.0014)*(d.main.humidity) + (1/a)));
-         },
+         'cy': function(d){return 0;},
          'r': function(d) { return 2; },
          transform: "translate(0, 0)"
        });
+
+       circle.transition()
+        .delay(400)
+        .duration(1000)
+        .ease("bounce")
+        .attr("cy", function(d){
+          var v = Math.pow(d.wind.speed, 0.75);
+          var a = 1.76 + 1.4*v;
+          return yScale(37-(37-(d.main.temp-273.15))/(0.68 - (0.0014)*(d.main.humidity) + (1/a)));
+        });
     }
 
     if($("#chkFukai:checked").val()){
@@ -165,7 +184,7 @@ export default class Graph{
         .attr({
           transform: "translate(0, 0)"})
         .style("stroke-width", 2)
-        .style("stroke", "steelblue")
+        .style("stroke", "#892706")
         .style("fill", "none");
 
 
@@ -176,12 +195,20 @@ export default class Graph{
        .attr({
          // enterに入っているデータ一つ一つで下の処理を行う
          'cx': function(d){return xScale(d.dt);},
-         'cy': function(d){
-           return yScale(0.81*(d.main.temp - 273.15) + 0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3);
-         },
+         'cy': function(d){return 0;},
          'r': function(d) { return 2; },
          transform: "translate(0, 0)"
        });
+
+       circle.transition()
+        .delay(400)
+        .duration(1000)
+        .ease("bounce")
+        .attr("cy", function(d){
+          var v = Math.pow(d.wind.speed, 0.75);
+          var a = 1.76 + 1.4*v;
+          return yScale(0.81*(d.main.temp - 273.15) + 0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3);
+        });
     }
 
   }
