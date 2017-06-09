@@ -31,7 +31,7 @@ export default class Graph{
     let margin = {top: 20, right: 20, bottom: 30, left: 40};
     let w = 1000 - margin.left - margin.right;
     let h = 700 - margin.top - margin.bottom;
-    let padding = 20;
+    let padding = 30;
 
     //スケール関数でグラフ表示の範囲を決める
     let xScale = d3.scale.linear()
@@ -39,7 +39,7 @@ export default class Graph{
       .range([padding, w-margin.left]);
 
     let yScale = d3.scale.linear()
-      .domain([0, 100])
+      .domain([-100, 100])
       .range([h-padding, padding]);
 
     //svg領域を確保
@@ -70,7 +70,7 @@ export default class Graph{
 　  svg.append("g")
       .attr({
         class:"y axis",
-        transform: "translate(20, 0)"})
+        transform: "translate(30, 0)"})
       .call(yAxis);
 
     /*ここまではグラフの共通部分
@@ -120,7 +120,7 @@ export default class Graph{
       let d3line = d3.svg.line()
         .x(function(d){return xScale(d.dt);})
         .y(function(d){return yScale(d.main.humidity);})
-        .interpolate("cardinal");
+        .interpolate("linear");
 
       svg.append("path")
         .attr("d", d3line(forecastlist))
