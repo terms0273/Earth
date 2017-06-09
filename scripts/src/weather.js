@@ -19,11 +19,15 @@ export default class Weather{
         $("#pressure").text(json.main.pressure + "hPa");
         $("#humidity").text(json.main.humidity + "%");//湿度％
 
+        var dateFormat = require('dateformat');
+
         this.sunrise = json.sys.sunrise;
-        $("#sunrise").text(new Date(this.sunrise * 1000));
+        $("#sunrise")
+        .text(dateFormat(new Date(this.sunrise * 1000),"yyyy/mm/dd HH:MM"));
 
         this.sunset = json.sys.sunset;
-        $("#sunset").text(new Date(this.sunset * 1000));
+        $("#sunset")
+        .text(dateFormat(new Date(this.sunset * 1000),"yyyy/mm/dd HH:MM"));
 
         this.lat = json.coord.lat;
         this.lon = json.coord.lon;
