@@ -98,7 +98,16 @@ export default class OneDayWeatherForecast{
           if(d === null){
             return "/assets/images/finished-icon.png";
           }else{
-            return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png";
+            let dn = "d";
+            if(!this.isSun(d.dt)){
+              dn = "n";
+            }
+            console.log(dn);
+            let iconName = d.weather[0].icon
+                          .slice(0,d.weather[0].icon.length - 1)
+                          + dn;
+            console.log(iconName);
+            return "http://openweathermap.org/img/w/"+iconName+".png";
           }
         }
       });
@@ -148,7 +157,7 @@ export default class OneDayWeatherForecast{
                  * (radius - 50);
         },
         href: () => {
-          if(this.isSun()){
+          if(this.isSun(this.date.getTime() / 1000)){
             return "http://openweathermap.org/img/w/01d.png";
           }else{
             return "http://openweathermap.org/img/w/01n.png";
@@ -226,13 +235,12 @@ export default class OneDayWeatherForecast{
   }
 
   /*
-   *太陽か月かを判断する
+   *指定された時刻が太陽か月かを判断する
    */
-  isSun(){
-    let dt = this.date.getTime() / 1000;
-    if(this.sunrise <= dt && dt <= this.sunset){
-      return true;
+    isSun(dt){
+      if(this.sunrise <= dt && dt <= this.sunset){
+        return true;
+      }
+      return false;
     }
-    return false;
-  }
 }
