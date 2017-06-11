@@ -11,6 +11,7 @@ export default class OneDayWeatherForecast{
 
     //メンバー変数の初期化
     this.date = new Date();
+    //TODO:朝9時まではすべて夜になってしまうバグを治す
     //現在の日付の時間を変更する デバッグ用コメント
     //this.date.setHours(3);
     this.sunrise = weather.sunrise;
@@ -26,21 +27,7 @@ export default class OneDayWeatherForecast{
       console.log(json);
       this.json = json;
 
-      //データの初期化
-      this.forecastList = [];
-      //表示しないアイコン数
-      this.notDataCount = new Date(this.json.list[0].dt * 1000).getHours() / 3 - 1;
-      //21時以降だと-1になってしまうので
-      if(this.notDataCount == -1){
-        this.notDataCount = 7
-      }
-      for(let i = 0; i < this.notDataCount; i++){
-        this.forecastList.push(null);
-      }
-      for(let i = 0; i < 8 - this.notDataCount; i++){
-        this.forecastList.push(this.json.list[i]);
-      }
-
+      this.updateForecastList(json.list[0].dt);
       this.print();
     },
       (err) =>{
@@ -115,7 +102,6 @@ export default class OneDayWeatherForecast{
             if(!this.isSun(d.dt)){
               dn = "n";
             }
-            console.log(d.weather[0].icon);
             let iconName = d.weather[0].icon
                           .slice(0,d.weather[0].icon.length - 1)
                           + dn;
@@ -254,24 +240,38 @@ export default class OneDayWeatherForecast{
    *dt:秒単位
    */
   updateForecastList(dt){
-    //dtを0時 + 1秒に戻す
-    dt = new Date(dt * 1000);
-    dt.setHours(0);
-    dt = dt.getTime() / 1000 + 1;
     //データの初期化
     this.forecastList = [];
     this.notDataCount = 0;
-    let i = 0;
-    let count = 0;
-    while(count < 8){
-      let forecastDt = this.json.list[i++];
-      if(forecastDt.dt >= dt){
-        this.forecastList.push(forecastDt);
-        count++;
+
+    let date = new Date(dt * 1000);
+    let tempDate = new Date(this.json.list[0].dt * 1000);
+    //今日か今日以外か
+    if(date.getUTCDate() === tempDate.getUTCDate()){
+      //表示しないアイコン数
+      this.notDataCount = tempDate.getHours() / 3 - 1;
+      //21時以降だと-1になってしまうので
+      if(this.notDataCount == -1){
+        this.notDataCount = 7;
+      }
+      for(let i = 0; i < this.notDataCount; i++){
+        this.forecastList.push(null);
+      }
+      for(let i = 0; i < 8 - this.notDataCount; i++){
+        this.forecastList.push(this.json.list[i]);
+      }
+    }else{
+      let i = 0;
+      let count = 0;
+      while(count < 8){
+        let forecast = this.json.list[i++];
+        if(forecast.dt >= date.getTime() / 1000 + 1){
+          this.forecastList.push(forecast);
+          count++;
+        }
       }
     }
     console.log(this.forecastList);
-    this.print();
   }
   /*
    *指定された時刻が太陽か月かを判断する
