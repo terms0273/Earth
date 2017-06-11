@@ -25,6 +25,22 @@ export default class OneDayWeatherForecast{
       //成功したときの処理
       console.log(json);
       this.json = json;
+
+      //データの初期化
+      this.forecastList = [];
+      //表示しないアイコン数
+      this.notDataCount = new Date(this.json.list[0].dt * 1000).getHours() / 3 - 1;
+      //21時以降だと-1になってしまうので
+      if(this.notDataCount == -1){
+        this.notDataCount = 7
+      }
+      for(let i = 0; i < this.notDataCount; i++){
+        this.forecastList.push(null);
+      }
+      for(let i = 0; i < 8 - this.notDataCount; i++){
+        this.forecastList.push(this.json.list[i]);
+      }
+
       this.print();
     },
       (err) =>{
@@ -37,8 +53,8 @@ export default class OneDayWeatherForecast{
    *1日の詳細の天気予報を表示する
    */
   print(){
-    d3.select("#one-day svg").remove();
-    
+    d3.select("#one-day > svg").remove();
+
     let width = 760;
     let height = 350;
     let radius = 100;
@@ -55,31 +71,16 @@ export default class OneDayWeatherForecast{
         + (radius + margin + 20) +")"
       );
 
-    //データの初期化
-    let data = [];
-    //表示しないアイコン数
-    let notDataCount = new Date(this.json.list[0].dt * 1000).getHours() / 3 - 1;
-    //21時以降だと-1になってしまうので
-    if(notDataCount == -1){
-      notDataCount = 7
-    }
-    for(let i = 0; i < notDataCount; i++){
-      data.push(null);
-    }
-    for(let i = 0; i < 8 - notDataCount; i++){
-      data.push(this.json.list[i]);
-    }
-
     // 360度になるように均等に角度を割りふる。
     let rScale = d3.scale.linear()
-      .domain([0,data.length])
+      .domain([0,this.forecastList.length])
       .range([135,495]);
 
     //日付を表示する
     let dateFormat = require('dateformat');
     let now = svg.append("g")
       .selectAll("text")
-      .data([data[notDataCount]])
+      .data([this.forecastList[this.notDataCount]])
       .enter()
       .append("text")
       .attr({
@@ -90,7 +91,7 @@ export default class OneDayWeatherForecast{
 
 
     //天気予報のアイコンを表示する
-    let rotated = translated.selectAll("g").data(data).enter()
+    let rotated = translated.selectAll("g").data(this.forecastList).enter()
       .append("g");
     let image = rotated.append("image")
       .attr({
@@ -114,17 +115,16 @@ export default class OneDayWeatherForecast{
             if(!this.isSun(d.dt)){
               dn = "n";
             }
-            console.log(dn);
+            console.log(d.weather[0].icon);
             let iconName = d.weather[0].icon
                           .slice(0,d.weather[0].icon.length - 1)
                           + dn;
-            console.log(iconName);
             return "http://openweathermap.org/img/w/"+iconName+".png";
           }
         }
       });
 
-      //TODO:dataを使わないで表示しているのは危ない気がする
+      //TODO:this.forecastListを使わないで表示しているのは危ない気がする
     //時間をテキストで表示する 例）21:00
     let nowScale = d3.scale.linear()
       .domain([0,24])
@@ -247,6 +247,32 @@ export default class OneDayWeatherForecast{
       });
   }
 
+  //TODO:今日かそれ以外かで処理を分ける
+  /*
+   *日付をもらいForecastListを更新し
+   *再描画する
+   *dt:秒単位
+   */
+  updateForecastList(dt){
+    //dtを0時 + 1秒に戻す
+    dt = new Date(dt * 1000);
+    dt.setHours(0);
+    dt = dt.getTime() / 1000 + 1;
+    //データの初期化
+    this.forecastList = [];
+    this.notDataCount = 0;
+    let i = 0;
+    let count = 0;
+    while(count < 8){
+      let forecastDt = this.json.list[i++];
+      if(forecastDt.dt >= dt){
+        this.forecastList.push(forecastDt);
+        count++;
+      }
+    }
+    console.log(this.forecastList);
+    this.print();
+  }
   /*
    *指定された時刻が太陽か月かを判断する
    */
