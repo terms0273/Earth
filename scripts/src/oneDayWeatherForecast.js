@@ -53,7 +53,7 @@ export default class OneDayWeatherForecast{
     let translated = svg.append("g")
       .attr("transform","translate("
         + (radius + margin) +","
-        + (radius + margin) +")"
+        + (radius + margin + 20) +")"
       );
 
     //データの初期化
@@ -76,10 +76,23 @@ export default class OneDayWeatherForecast{
       .domain([0,data.length])
       .range([135,495]);
 
-    let rotated = translated.selectAll("g").data(data).enter()
-      .append("g");
+    //日付を表示する
+    let dateFormat = require('dateformat');
+    let now = svg.append("g")
+      .selectAll("text")
+      .data([data[notDataCount]])
+      .enter()
+      .append("text")
+      .attr({
+        x:radius + margin,
+        y:20
+      })
+      .text((d) => {return dateFormat(new Date(d.dt * 1000 - 1),"m/d(ddd)")});
+
 
     //天気予報のアイコンを表示する
+    let rotated = translated.selectAll("g").data(data).enter()
+      .append("g");
     let image = rotated.append("image")
       .attr({
         x:0,

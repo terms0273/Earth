@@ -34,7 +34,7 @@ $(function() {
     }
   });
   weather.send(weather.city);
-  setTimeout(()=>{oneDay.init(weather);}, 200);
+  setTimeout(()=>{oneDay.init(weather);}, 500);
 
   //検索したときの動作
   function updateWeather(){
