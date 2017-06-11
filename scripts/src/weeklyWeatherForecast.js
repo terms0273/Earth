@@ -11,7 +11,6 @@ export default class WeeklyWeatherForecast {
    * @param  cityName
    */
   init(cityName) {
-    d3.select("#weekly").select("svg").remove();
     let url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" +
     cityName +
     "&appid=9ab6492bf227782c3c7ae7417a624014";
@@ -31,6 +30,8 @@ export default class WeeklyWeatherForecast {
    * 週間天気予報表示
    */
   print() {
+    d3.select("#weekly > svg").remove();
+    
     let w = 850;
     let h = 200;
     let padding = 25;
