@@ -9,8 +9,6 @@ export default class OneDayWeatherForecast{
    */
   init(weather){
 
-    d3.select("#one-day svg").remove();
-
     //メンバー変数の初期化
     this.date = new Date();
     //現在の日付の時間を変更する デバッグ用コメント
@@ -39,7 +37,8 @@ export default class OneDayWeatherForecast{
    *1日の詳細の天気予報を表示する
    */
   print(){
-
+    d3.select("#one-day svg").remove();
+    
     let width = 760;
     let height = 350;
     let radius = 100;
@@ -125,6 +124,7 @@ export default class OneDayWeatherForecast{
         }
       });
 
+      //TODO:dataを使わないで表示しているのは危ない気がする
     //時間をテキストで表示する 例）21:00
     let nowScale = d3.scale.linear()
       .domain([0,24])
@@ -250,10 +250,10 @@ export default class OneDayWeatherForecast{
   /*
    *指定された時刻が太陽か月かを判断する
    */
-    isSun(dt){
-      if(this.sunrise <= dt && dt <= this.sunset){
-        return true;
-      }
-      return false;
+  isSun(dt){
+    if(this.sunrise <= dt && dt <= this.sunset){
+      return true;
     }
+    return false;
+  }
 }
