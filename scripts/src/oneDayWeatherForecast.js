@@ -105,7 +105,7 @@ export default class OneDayWeatherForecast{
             return "/assets/images/finished-icon.png";
           }else{
             let dn = "d";
-            if(!this.isSun(d.dt)){
+            if(!this.isSun(d.dt + this.timeZone / 1000)){
               dn = "n";
             }
             let iconName = d.weather[0].icon
@@ -247,7 +247,6 @@ export default class OneDayWeatherForecast{
   //TODO:今日かそれ以外かで処理を分ける
   /*
    *日付をもらいForecastListを更新し
-   *再描画する
    *dt:秒単位
    */
   updateForecastList(dt){
