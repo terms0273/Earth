@@ -315,7 +315,18 @@ export default class OneDayWeatherForecast{
    *指定された時刻が太陽か月かを判断する
    */
   isSun(dt){
-    if(this.sunrise + this.timeZone / 1000 <= dt && dt <= this.sunset + this.timeZone / 1000){
+    let temp = new Date(dt * 1000);
+    let minutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
+    temp = new Date(this.sunrise * 1000 + this.timeZone);
+    let riseMinutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
+    temp = new Date(this.sunset * 1000 + this.timeZone);
+    let setMinutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
+
+    if(riseMinutes > setMinutes){
+      setMinutes += 24 * 60;
+    }
+
+    if(riseMinutes <= minutes && minutes <= setMinutes){
       return true;
     }
     return false;
