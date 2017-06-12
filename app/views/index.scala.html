@@ -1,6 +1,6 @@
 @(loginForm: Form[models.Account])
 @main("Main") {
-
+  <span id="tooltip"></span>
     <div class="uk-margin" uk-grid>
         <div class="uk-width-auto">
             <div id="side" class="uk-margin-left uk-padding-small">
@@ -102,7 +102,7 @@
                     <ul uk-tab>
                       <li class="uk-active"><a href="#">Map</a></li>
                       <li><a id="tag-graph" href="#">Graph</a></li>
-                      <li><a href="#">Weather Forecast</a></li>
+                      <li><a id="tab-weather-forecast" href="#">Weather Forecast</a></li>
                     </ul>
                     <div class="tab-contents uk-switcher uk-margin">
                       <li>
@@ -121,8 +121,8 @@
                         </div>
                       </li>
                       <li>
-                        <div id="weatherForecast">
-                          <div id="oneDay"></div>
+                        <div id="weather-forecast">
+                          <div id="one-day"></div>
                           <div id="weekly"></div>
                         </div>
                       </li>
@@ -132,5 +132,4 @@
             </div>
         </div>
     </div>
-
 }
