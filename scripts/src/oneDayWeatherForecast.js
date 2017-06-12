@@ -70,7 +70,7 @@ export default class OneDayWeatherForecast{
     let dateFormat = require('dateformat');
     let now = svg.append("g")
       .selectAll("text")
-      .data([this.forecastList[this.notDataCount]])
+      .data([this.forecastList[0]])
       .enter()
       .append("text")
       .attr({
