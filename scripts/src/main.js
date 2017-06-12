@@ -9,7 +9,7 @@ $(function() {
   let map = new Map();
   let graph = new Graph();
   let oneDay = new OneDayWeatherForecast();
-  let weekly = new WeeklyWeatherForecast();
+  let weekly = new WeeklyWeatherForecast(oneDay);
 
   //検索ボタン押したときに呼ぶ
   $("#search-city").click(updateWeather);
@@ -17,7 +17,7 @@ $(function() {
   $("#tab-weather-forecast").click(()=>{
     if($("#tab-weather-forecast").parent().attr("aria-expanded") === "false"){
       oneDay.print();
-      weekly.print();
+      weekly.print(oneDay);
     }
   });
   //チェックボックスにチェック
@@ -39,7 +39,7 @@ $(function() {
     let newCity = $("#input-city").val();
     weather.send(newCity,map);
     setTimeout(function(){graph.init(weather.city)}, 500);
-    setTimeout(()=>{weekly.init(weather.city);}, 500);
+    setTimeout(()=>{weekly.init(weather.city,oneDay);}, 500);
     setTimeout(()=>{oneDay.init(weather);}, 500);
   };
 });

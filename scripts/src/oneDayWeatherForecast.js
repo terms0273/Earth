@@ -135,7 +135,11 @@ export default class OneDayWeatherForecast{
           return Math.sin(rScale(i) * Math.PI / 180) * (radius + 40) + 30;
         }
       })
-      .text((d,i) => {return (i * 3 + 3  % 24) + ":00";});
+      .text((d,i) => {
+        var dateFormat = require('dateformat');
+        //TODO:timeZoneを追加してね♥
+        return dateFormat(new Date(d.dt * 1000),"HH:MM");
+      });
 
     //現在の太陽or月を表示する
     let nowIcon = translated.append("image")
@@ -245,6 +249,7 @@ export default class OneDayWeatherForecast{
     this.notDataCount = 0;
 
     let date = new Date(dt * 1000);
+    date.setUTCHours(0);
     let tempDate = new Date(this.json.list[0].dt * 1000);
     //今日か今日以外か
     if(date.getUTCDate() === tempDate.getUTCDate()){
