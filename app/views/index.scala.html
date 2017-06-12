@@ -100,9 +100,9 @@
                       </div>
                     </div>
                     <ul uk-tab>
-                      <li class="uk-active"><a href="#">Map</a></li>               
-                      <li><a id="tab-graph" href="#">Graph</a></li>
-                      <li><a id="tab-weather-forecast"href="#">Weather Forecast</a></li>
+                      <li class="uk-active"><a href="#">Map</a></li>
+                      <li><a id="tag-graph" href="#">Graph</a></li>
+                      <li><a href="#">Weather Forecast</a></li>
                     </ul>
                     <div class="tab-contents uk-switcher uk-margin">
                       <li>
@@ -113,16 +113,16 @@
                       <li>
                         <div id="graph">
                           <form id="slctGraph">
-                            <input id="chkTemp" type="checkbox" name="temp" value="1">Temperature
-                            <input id="chkHumide" type="checkbox" name="humide" value="2" >Humidity
-                            <input id="chkTaikan" type="checkbox" name="degree" value="3" >体感温度
-                            <input id="chkFukai" type="checkbox" name="index" value="4" >不快指数
+                            <input id="chkTemp" type="checkbox" name="temp" value="1" ><font color="#ff00ff">Temperature(℃)</font>
+                            <input id="chkHumide" type="checkbox" name="humide" value="2" ><font color="#313198">Humidity(%)</font>
+                            <input id="chkTaikan" type="checkbox" name="degree" value="3" ><font color="#ff6699">Windchill(℃)</font>
+                            <input id="chkFukai" type="checkbox" name="index" value="4" ><font color="#892706">Disconfort Index</font>
                           </form>
                         </div>
                       </li>
                       <li>
-                        <div id="weather-forecast">
-                          <div id="one-day"></div>
+                        <div id="weatherForecast">
+                          <div id="oneDay"></div>
                           <div id="weekly"></div>
                         </div>
                       </li>
