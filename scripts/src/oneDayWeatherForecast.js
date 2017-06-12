@@ -63,8 +63,8 @@ export default class OneDayWeatherForecast{
 
     // 360度になるように均等に角度を割りふる。
     let rScale = d3.scale.linear()
-      .domain([0,this.forecastList.length])
-      .range([135,495]);
+      .domain([0,24])
+      .range([90,450]);
 
     //日付を表示する
     let dateFormat = require('dateformat');
@@ -77,7 +77,10 @@ export default class OneDayWeatherForecast{
         x:radius + margin,
         y:20
       })
-      .text((d) => {return dateFormat(new Date(d.dt * 1000 - 1 + this.timeZone),"m/d(ddd)")});
+      .text((d) => {
+        return dateFormat(new Date(d.dt * 1000 - 1 + this.timeZone)
+               .toUTCString(),"UTC:m/d(ddd)");
+      });
 
 
     //天気予報のアイコンを表示する
@@ -95,10 +98,10 @@ export default class OneDayWeatherForecast{
       .duration(500)
       .ease("linear")
       .attr({
-        x:(d,i) => {return Math.cos(rScale(i) * Math.PI / 180) * radius},
-        y:(d,i) => {return Math.sin(rScale(i) * Math.PI / 180) * radius},
+        x:(d,i) => {return Math.cos(rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * radius},
+        y:(d,i) => {return Math.sin(rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * radius},
         href:(d) => {
-          if(d === null){
+          if(typeof d.weather === "undefined"){
             return "/assets/images/finished-icon.png";
           }else{
             let dn = "d";
@@ -113,7 +116,6 @@ export default class OneDayWeatherForecast{
         }
       });
 
-      //TODO:this.forecastListを使わないで表示しているのは危ない気がする
     //時間をテキストで表示する 例）21:00
     let nowScale = d3.scale.linear()
       .domain([0,24])
@@ -132,16 +134,15 @@ export default class OneDayWeatherForecast{
       .ease("linear")
       .attr({
         x:(d,i) => {
-          return Math.cos(rScale(i) * Math.PI / 180) * (radius + 40) + 3;
+          return Math.cos(rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * (radius + 40) + 3;
         },
         y:(d,i) => {
-          return Math.sin(rScale(i) * Math.PI / 180) * (radius + 40) + 30;
+          return Math.sin(rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * (radius + 40) + 30;
         }
       })
       .text((d,i) => {
         var dateFormat = require('dateformat');
-        //TODO:timeZoneを追加してね♥
-        return dateFormat(new Date(d.dt * 1000),"HH:MM");
+        return new Date(d.dt * 1000 + this.timeZone).getUTCHours() + ":00";
       });
 
     //現在の太陽or月を表示する
@@ -263,7 +264,8 @@ export default class OneDayWeatherForecast{
         this.notDataCount = 7;
       }
       for(let i = 0; i < this.notDataCount; i++){
-        this.forecastList.push(null);
+        let forwardDt = this.json.list[0].dt - (3600 * 3) * (this.notDataCount - i);
+        this.forecastList.push({"dt":forwardDt});
       }
       for(let i = 0; i < 8 - this.notDataCount; i++){
         this.forecastList.push(this.json.list[i]);
@@ -273,7 +275,8 @@ export default class OneDayWeatherForecast{
       let count = 0;
       while(count < 8){
         let forecast = this.json.list[i++];
-        if(forecast.dt >= date.getTime() / 1000 + 1){
+        let temp = date.getTime() / 1000 + 1;
+        if(forecast.dt + this.timeZone / 1000 >= temp){
           this.forecastList.push(forecast);
           count++;
         }
