@@ -30,7 +30,7 @@ export default class OneDayWeatherForecast{
       this.sunrise = weather.sunrise;
       this.sunset = weather.sunset;
       this.json = json;
-      this.updateForecastList(json.list[0].dt);
+      this.updateForecastList(json.list[0].dt - 1);
       this.print();
     },
       (err) =>{
@@ -164,7 +164,7 @@ export default class OneDayWeatherForecast{
                  * (radius - 50);
         },
         href: () => {
-          let tempDate = new Date(this.forecastList[0].dt * 1000 + this.timeZone);
+          let tempDate = new Date(this.forecastList[0].dt * 1000 + this.timeZone - 1);
           if(this.date.getUTCDate() !== tempDate.getUTCDate()){
             return null;
           }else if(this.isSun(this.date.getTime() / 1000)){
@@ -257,7 +257,8 @@ export default class OneDayWeatherForecast{
 
     let date = new Date(dt * 1000 + this.timeZone);
     date.setUTCHours(0);
-    let tempDate = new Date(this.json.list[0].dt * 1000 + this.timeZone);
+    //21時から24時の間が次の日判定になってしまうため - 1をする
+    let tempDate = new Date(this.json.list[0].dt * 1000 + this.timeZone - 1);
     //今日か今日以外か
     if(date.getUTCDate() === tempDate.getUTCDate()){
       //表示しないアイコン数
