@@ -312,7 +312,7 @@ export default class OneDayWeatherForecast{
    *指定された時刻が太陽か月かを判断する
    */
   isSun(dt){
-    if(this.sunrise <= dt && dt <= this.sunset){
+    if(this.sunrise + this.timeZone / 1000 <= dt && dt <= this.sunset + this.timeZone / 1000){
       return true;
     }
     return false;
