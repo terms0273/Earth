@@ -9,24 +9,28 @@ export default class OneDayWeatherForecast{
    */
   init(weather){
 
-    d3.select("#one-day svg").remove();
 
-    //メンバー変数の初期化
-    this.date = new Date();
+    //TODO:朝9時まではすべて夜になってしまうバグを治す
     //現在の日付の時間を変更する デバッグ用コメント
     //this.date.setHours(3);
-    this.sunrise = weather.sunrise;
-    this.sunset = weather.sunset;
 
     let url = "http://api.openweathermap.org/data/2.5/forecast?q=" +
-    weather.cityName +
-    "&appid=9ab6492bf227782c3c7ae7417a624014";
+      weather.city +
+      "&appid=9ab6492bf227782c3c7ae7417a624014";
+
     $.ajax({
       url:url
     }).then((json) =>{
       //成功したときの処理
       console.log(json);
+      //メンバー変数の初期化
+      this.timeZone = this.timeZoneOffset(weather.lat,weather.lon) * 1000;
+      console.log(this.timeZone);
+      this.date = new Date(Date.now() + this.timeZone);
+      this.sunrise = weather.sunrise;
+      this.sunset = weather.sunset;
       this.json = json;
+      this.updateForecastList(json.list[0].dt);
       this.print();
     },
       (err) =>{
@@ -39,6 +43,7 @@ export default class OneDayWeatherForecast{
    *1日の詳細の天気予報を表示する
    */
   print(){
+    d3.select("#one-day > svg").remove();
 
     let width = 760;
     let height = 350;
@@ -53,33 +58,31 @@ export default class OneDayWeatherForecast{
     let translated = svg.append("g")
       .attr("transform","translate("
         + (radius + margin) +","
-        + (radius + margin) +")"
+        + (radius + margin + 20) +")"
       );
-
-    //データの初期化
-    let data = [];
-    //表示しないアイコン数
-    let notDataCount = new Date(this.json.list[0].dt * 1000).getHours() / 3 - 1;
-    //21時以降だと-1になってしまうので
-    if(notDataCount == -1){
-      notDataCount = 7
-    }
-    for(let i = 0; i < notDataCount; i++){
-      data.push(null);
-    }
-    for(let i = 0; i < 8 - notDataCount; i++){
-      data.push(this.json.list[i]);
-    }
 
     // 360度になるように均等に角度を割りふる。
     let rScale = d3.scale.linear()
-      .domain([0,data.length])
+      .domain([0,this.forecastList.length])
       .range([135,495]);
 
-    let rotated = translated.selectAll("g").data(data).enter()
-      .append("g");
+    //日付を表示する
+    let dateFormat = require('dateformat');
+    let now = svg.append("g")
+      .selectAll("text")
+      .data([this.forecastList[this.notDataCount]])
+      .enter()
+      .append("text")
+      .attr({
+        x:radius + margin,
+        y:20
+      })
+      .text((d) => {return dateFormat(new Date(d.dt * 1000 - 1 + this.timeZone),"m/d(ddd)")});
+
 
     //天気予報のアイコンを表示する
+    let rotated = translated.selectAll("g").data(this.forecastList).enter()
+      .append("g");
     let image = rotated.append("image")
       .attr({
         x:0,
@@ -98,11 +101,19 @@ export default class OneDayWeatherForecast{
           if(d === null){
             return "/assets/images/finished-icon.png";
           }else{
-            return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png";
+            let dn = "d";
+            if(!this.isSun(d.dt)){
+              dn = "n";
+            }
+            let iconName = d.weather[0].icon
+                          .slice(0,d.weather[0].icon.length - 1)
+                          + dn;
+            return "http://openweathermap.org/img/w/"+iconName+".png";
           }
         }
       });
 
+      //TODO:this.forecastListを使わないで表示しているのは危ない気がする
     //時間をテキストで表示する 例）21:00
     let nowScale = d3.scale.linear()
       .domain([0,24])
@@ -127,7 +138,11 @@ export default class OneDayWeatherForecast{
           return Math.sin(rScale(i) * Math.PI / 180) * (radius + 40) + 30;
         }
       })
-      .text((d,i) => {return (i * 3 + 3  % 24) + ":00";});
+      .text((d,i) => {
+        var dateFormat = require('dateformat');
+        //TODO:timeZoneを追加してね♥
+        return dateFormat(new Date(d.dt * 1000),"HH:MM");
+      });
 
     //現在の太陽or月を表示する
     let nowIcon = translated.append("image")
@@ -140,15 +155,15 @@ export default class OneDayWeatherForecast{
       .ease("linear")
       .attr({
         x:() => {
-          return Math.cos(nowScale(this.date.getHours()) * Math.PI / 180)
+          return Math.cos(nowScale(this.date.getUTCHours()) * Math.PI / 180)
                  * (radius - 50);
         },
         y:() => {
-          return Math.sin(nowScale(this.date.getHours()) * Math.PI / 180)
+          return Math.sin(nowScale(this.date.getUTCHours()) * Math.PI / 180)
                  * (radius - 50);
         },
         href: () => {
-          if(this.isSun()){
+          if(this.isSun(this.date.getTime() / 1000)){
             return "http://openweathermap.org/img/w/01d.png";
           }else{
             return "http://openweathermap.org/img/w/01n.png";
@@ -190,9 +205,9 @@ export default class OneDayWeatherForecast{
       .innerRadius(function(d){return 20;})
       .outerRadius(function(d){return radius + 20;});
 
-    let temp = new Date(risedt * 1000);
+    let temp = new Date(risedt * 1000 + this.timeZone);
     let riseSecond =
-      temp.getHours() * 3600 + temp.getMinutes() * 60 + temp.getSeconds();
+      temp.getUTCHours() * 3600 + temp.getUTCMinutes() * 60 + temp.getUTCSeconds();
     let circleGraph = translated.append("g");
     circleGraph.selectAll("path")
       .data(dataArr)
@@ -225,11 +240,75 @@ export default class OneDayWeatherForecast{
       });
   }
 
+  //TODO:今日かそれ以外かで処理を分ける
   /*
-   *太陽か月かを判断する
+   *日付をもらいForecastListを更新し
+   *再描画する
+   *dt:秒単位
    */
-  isSun(){
-    let dt = this.date.getTime() / 1000;
+  updateForecastList(dt){
+    //データの初期化
+    this.forecastList = [];
+    this.notDataCount = 0;
+
+    let date = new Date(dt * 1000 + this.timeZone);
+    date.setUTCHours(0);
+    let tempDate = new Date(this.json.list[0].dt * 1000 + this.timeZone);
+    //今日か今日以外か
+    if(date.getUTCDate() === tempDate.getUTCDate()){
+      //表示しないアイコン数
+      this.notDataCount = Math.ceil(tempDate.getUTCHours() / 3 - 1);
+      //21時以降だと-1になってしまうので
+      if(this.notDataCount == -1){
+        this.notDataCount = 7;
+      }
+      for(let i = 0; i < this.notDataCount; i++){
+        this.forecastList.push(null);
+      }
+      for(let i = 0; i < 8 - this.notDataCount; i++){
+        this.forecastList.push(this.json.list[i]);
+      }
+    }else{
+      let i = 0;
+      let count = 0;
+      while(count < 8){
+        let forecast = this.json.list[i++];
+        if(forecast.dt >= date.getTime() / 1000 + 1){
+          this.forecastList.push(forecast);
+          count++;
+        }
+      }
+    }
+    console.log(this.forecastList);
+  }
+
+  /*
+   *緯度、経度を入れるとoffsetを返す
+   *return offset秒単位
+   */
+  timeZoneOffset(lon,lat){
+    let timeZone;
+    let url = "https://maps.googleapis.com/maps/api/timezone/json?"
+             +"location="+lon+","+lat+"&"
+             +"timestamp=0&sensor=false";
+    let json = $.ajax({
+
+      type: "GET",
+      url:url,
+      async: false,
+      success: (json) => {
+        timeZone = json.rawOffset;
+      },
+  		error: (err) => {
+  			console.log(err);
+  		}
+    });
+    return timeZone;
+  }
+  /*
+   *指定された時刻が太陽か月かを判断する
+   */
+  isSun(dt){
     if(this.sunrise <= dt && dt <= this.sunset){
       return true;
     }

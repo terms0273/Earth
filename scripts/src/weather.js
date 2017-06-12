@@ -4,7 +4,12 @@ export default class Weather{
     }
     print(json){
         this.city = json.name;
-        $("#city-name").html("<img src='/assets/images/flag/"+json.sys.country.toLowerCase()+".png'>" + this.city);
+        if(typeof json.sys.country !== "undefined"){
+          $("#city-name").html("<img src='/assets/images/flag/"+json.sys.country.toLowerCase()+".png'>" + this.city);
+        }else{
+          //画像が見つからない
+          $("#city-name").html(this.city);
+        }
         $("#weather").text(json.weather[0].main);
         $("#icon").html("<img src='http://openweathermap.org/img/w/"+json.weather[0].icon+".png'>");
         let num = Number(json.main.temp - 273 );
@@ -14,11 +19,15 @@ export default class Weather{
         $("#pressure").text(json.main.pressure + "hPa");
         $("#humidity").text(json.main.humidity + "%");//湿度％
 
+        var dateFormat = require('dateformat');
+
         this.sunrise = json.sys.sunrise;
-        $("#sunrise").text(new Date(this.sunrise * 1000));
+        $("#sunrise")
+        .text(dateFormat(new Date(this.sunrise * 1000),"yyyy/mm/dd HH:MM"));
 
         this.sunset = json.sys.sunset;
-        $("#sunset").text(new Date(this.sunset * 1000));
+        $("#sunset")
+        .text(dateFormat(new Date(this.sunset * 1000),"yyyy/mm/dd HH:MM"));
 
         this.lat = json.coord.lat;
         this.lon = json.coord.lon;

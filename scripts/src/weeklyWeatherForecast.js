@@ -1,8 +1,9 @@
 import * as d3 from "d3";
+import OneDayWeatherForecast from "./oneDayWeatherForecast";
 
 export default class WeeklyWeatherForecast {
-  constructor() {
-    this.init("Tokyo");
+  constructor(oneDay) {
+    this.init("Tokyo",oneDay);
   }
 
   /**
@@ -10,8 +11,7 @@ export default class WeeklyWeatherForecast {
    * print()の呼び出し
    * @param  cityName
    */
-  init(cityName) {
-    d3.select("#weekly").select("svg").remove();
+  init(cityName,oneDay) {
     let url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" +
     cityName +
     "&appid=9ab6492bf227782c3c7ae7417a624014";
@@ -21,7 +21,7 @@ export default class WeeklyWeatherForecast {
     }).then((json) =>{
       console.log(json);
       this.json = json;
-      this.print();
+      this.print(oneDay);
     },(err) =>{
       console.log(err);
     });
@@ -30,7 +30,9 @@ export default class WeeklyWeatherForecast {
   /**
    * 週間天気予報表示
    */
-  print() {
+  print(oneDay) {
+    d3.select("#weekly > svg").remove();
+
     let w = 850;
     let h = 200;
     let padding = 25;
@@ -105,10 +107,15 @@ export default class WeeklyWeatherForecast {
       });
 
     //週間天気予報の天気アイコン表示
-    weekly.append("image")
+    this.image = weekly.append("image");
       //on click 未実装
-      .on("click", function(d,i) {
 
+    this.image
+      .on("click", function(d,i) {
+        console.log(d.dt);
+        oneDay.updateForecastList(d.dt);
+        console.log(d.dt);
+        oneDay.print();
       })
       .transition()
       .duration(1000)
@@ -136,7 +143,7 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[2];}
       })
       .text(function(d) {
-        return new Number(d.temp.max - 273.15).toFixed(1);
+        return new Number(d.temp.max - 273.15).toFixed(1) + "℃";
       });
 
     //週間天気予報の最低気温表示
@@ -146,7 +153,7 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[3];}
       })
       .text(function(d) {
-        return new Number(d.temp.min - 273.15).toFixed(1);
+        return new Number(d.temp.min - 273.15).toFixed(1) + "℃";
       });
   }
 }
