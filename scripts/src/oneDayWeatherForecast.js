@@ -164,7 +164,10 @@ export default class OneDayWeatherForecast{
                  * (radius - 50);
         },
         href: () => {
-          if(this.isSun(this.date.getTime() / 1000)){
+          let tempDate = new Date(this.forecastList[0].dt * 1000 + this.timeZone);
+          if(this.date.getUTCDate() !== tempDate.getUTCDate()){
+            return null;
+          }else if(this.isSun(this.date.getTime() / 1000)){
             return "http://openweathermap.org/img/w/01d.png";
           }else{
             return "http://openweathermap.org/img/w/01n.png";
