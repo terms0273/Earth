@@ -104,7 +104,7 @@ export default class Graph{
         .attr({
           'cx': function(d){return xScale(d.dt);},
           'cy': 0,
-          'r': 2,
+          'r': 3,
           transform: "translate(0, 0)"
         })
         //点にカーソルをのせると表示
@@ -147,7 +147,7 @@ export default class Graph{
         .attr({
           'cx': function(d){return xScale(d.dt);},
           'cy': 0,
-          'r': 2,
+          'r': 3,
           transform: "translate(0, 0)"
         })
         //点にカーソルをのせると表示
@@ -188,7 +188,7 @@ export default class Graph{
         .attr({
           'cx': function(d){return xScale(d.dt);},
           'cy': 0,
-          'r':2,
+          'r':3,
           transform: "translate(0, 0)"
         })
         //点にカーソルをのせると表示
@@ -238,7 +238,7 @@ export default class Graph{
         .attr({
           'cx': function(d){return xScale(d.dt);},
           'cy': 0,
-          'r': 2,
+          'r': 3,
           transform: "translate(0, 0)"
         })
         .on("mouseover", function(d){
