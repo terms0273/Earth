@@ -145,9 +145,13 @@ export default class OneDayWeatherForecast{
         y:0
       })
       .on("mouseover", function(d){
+        let precipitation=d.rain["3h"];
+        if(typeof precipitation === "undefined"){
+          precipitation = 0;
+        }
         let text =
            "description&nbsp;&nbsp;：" + d.weather[0].description+"</br>"
-          +"precipitation：" + d.rain["3h"] + "(mm)";
+          +"precipitation：" + precipitation + "(mm)";
         return tooltip.style("visibility", "visible").html(text);})
       .on("mousemove", function(d){return tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+10)+"px");})
       .on("mouseout", function(d){return tooltip.style("visibility", "hidden")})
