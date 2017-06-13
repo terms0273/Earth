@@ -70,6 +70,7 @@ export default class WeeklyWeatherForecast {
     for (let i = 0; i < this.json.list.length; i++) {
       dataset[i] = this.json.list[i];
     }
+    console.log(oneDay.timeZone);
 
     let xScale = d3.scale.linear()
       .domain([0,dataset.length])
@@ -116,6 +117,12 @@ export default class WeeklyWeatherForecast {
         oneDay.updateForecastList(d.dt);
         console.log(d.dt);
         oneDay.print();
+      })
+      .on("mouseover", function() {
+        d3.select(this).attr("cursor", "pointer");
+      })
+      .on("mouseout", function() {
+        d3.select(this).attr("cursor", "default");
       })
       .transition()
       .duration(1000)
