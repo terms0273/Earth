@@ -37,7 +37,7 @@ export default class WeeklyWeatherForecast {
     let weather = this.weather;
     let w = 850;
     let h = 200;
-    let padding = 25;
+    let padding = 35;
 
     //曜日表示用配列
     let day = [];
@@ -140,7 +140,7 @@ export default class WeeklyWeatherForecast {
         href: function(d){
           return 'http://openweathermap.org/img/w/'+d.weather[0].icon+'.png';
         },
-        x: function(d,i){return xScale(i) + 70;},
+        x: function(d,i){return xScale(i) + 85;},
         y: function() {return yPoint[1];}
       });
 
