@@ -64,13 +64,15 @@ export default class OneDayWeatherForecast{
 
     this.datePrint(svg);
 
-    let rotated = translated.selectAll("g").data(this.forecastList).enter()
-      .append("g");
+    let pieGraph = translated.append("g");
+    let rotated = translated.selectAll("rotated").data(this.forecastList).enter()
+    .append("g");
+
     this.forecastIconPrint(rotated);
     this.timeTextPrint(rotated);
     this.nowIconPrint(translated);
     this.pointPrint(translated);
-    this.pieGraphPrint(translated);
+    this.pieGraphPrint(pieGraph);
   }
 
   /*
@@ -136,11 +138,19 @@ export default class OneDayWeatherForecast{
   }
   //天気予報のアイコンを表示する
   forecastIconPrint(tag){
+    let tooltip = d3.select("body").select("#tooltip");
     let image = tag.append("image");
     image.attr({
         x:0,
         y:0
       })
+      .on("mouseover", function(d){
+        let text =
+           "description&nbsp;&nbsp;：" + d.weather[0].description+"</br>"
+          +"precipitation：" + d.rain["3h"] + "(mm)";
+        return tooltip.style("visibility", "visible").html(text);})
+      .on("mousemove", function(d){return tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+10)+"px");})
+      .on("mouseout", function(d){return tooltip.style("visibility", "hidden")})
       .transition()
       .delay((d,i) => {
         return i * 50;
@@ -167,7 +177,7 @@ export default class OneDayWeatherForecast{
       });
     return image;
   }
-  //天気予報のアイコンを表示する
+  //時間テキストを表示する
   timeTextPrint(tag){
     let text = tag.append("text");
     text.attr({
@@ -189,18 +199,24 @@ export default class OneDayWeatherForecast{
         }
       })
       .text((d,i) => {
-        var dateFormat = require('dateformat');
         return new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours() + ":00";
       });
     return text;
   }
   //現在の太陽or月を表示する
   nowIconPrint(tag){
+    let now = this.date;
+    let tooltip = d3.select("body").select("#tooltip");
     let nowIcon = tag.append("image");
     nowIcon.attr({
         x:0,
         y:0
       })
+      .on("mouseover", function(d){
+        let dateFormat = require('dateformat');
+        return tooltip.style("visibility", "visible").text( "TIME "+ dateFormat(new Date(now),"UTC:HH:MM"));})
+      .on("mousemove", function(d){return tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+10)+"px");})
+      .on("mouseout", function(d){return tooltip.style("visibility", "hidden")})
       .transition()
       .duration(500)
       .ease("linear")
