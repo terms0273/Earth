@@ -1,9 +1,10 @@
 import * as d3 from "d3";
 import OneDayWeatherForecast from "./oneDayWeatherForecast";
+import {timeZoneOffset} from "./oneDayWeatherForecast";
 
 export default class WeeklyWeatherForecast {
-  constructor(oneDay) {
-    this.init("Tokyo",oneDay);
+  constructor(weather,oneDay) {
+    this.init(weather,oneDay);
   }
 
   /**
@@ -11,9 +12,9 @@ export default class WeeklyWeatherForecast {
    * print()の呼び出し
    * @param  cityName
    */
-  init(cityName,oneDay) {
+  init(weather,oneDay) {
     let url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" +
-    cityName +
+    weather.city +
     "&appid=9ab6492bf227782c3c7ae7417a624014";
 
     $.ajax({
@@ -21,6 +22,7 @@ export default class WeeklyWeatherForecast {
     }).then((json) =>{
       console.log(json);
       this.json = json;
+      this.weather = weather;
       this.print(oneDay);
     },(err) =>{
       console.log(err);
@@ -32,7 +34,7 @@ export default class WeeklyWeatherForecast {
    */
   print(oneDay) {
     d3.select("#weekly > svg").remove();
-
+    let weather = this.weather;
     let w = 850;
     let h = 200;
     let padding = 25;
@@ -100,10 +102,9 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[0];}
       })
       .text(function(d) {
-        let date = new Date(d.dt * 1000);
-        return (date.getMonth() + 1) + "/" +
-                date.getDate() +
-                "(" + day[date.getDay()] + ")";
+        let dateFormat = require('dateformat');
+        let date = new Date(d.dt * 1000 + weather.timeZone);
+        return dateFormat(date.toUTCString(),"UTC:m/d(ddd)");
       });
 
     //週間天気予報の天気アイコン表示

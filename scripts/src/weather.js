@@ -19,20 +19,22 @@ export default class Weather{
         $("#pressure").text(json.main.pressure + "hPa");
         $("#humidity").text(json.main.humidity + "%");//湿度％
 
-        var dateFormat = require('dateformat');
-
-        this.sunrise = json.sys.sunrise;
-        $("#sunrise")
-        .text(dateFormat(new Date(this.sunrise * 1000),"yyyy/mm/dd HH:MM"));
-
-        this.sunset = json.sys.sunset;
-        $("#sunset")
-        .text(dateFormat(new Date(this.sunset * 1000),"yyyy/mm/dd HH:MM"));
 
         this.lat = json.coord.lat;
         this.lon = json.coord.lon;
         $("#latlon").text("lat:" + this.lat + ",lot:" + this.lon);
 
+        this.timeZone = this.timeZoneOffset(this.lat,this.lon) * 1000;
+
+        var dateFormat = require('dateformat');
+
+        this.sunrise = json.sys.sunrise;
+        $("#sunrise")
+        .text(dateFormat(new Date(this.sunrise * 1000 + this.timeZone).toUTCString(),"UTC:yyyy/mm/dd HH:MM"));
+
+        this.sunset = json.sys.sunset;
+        $("#sunset")
+        .text(dateFormat(new Date(this.sunset * 1000 + this.timeZone).toUTCString(),"UTC:yyyy/mm/dd HH:MM"));
     }
 
     send(cityName,map){
@@ -49,5 +51,25 @@ export default class Weather{
         },(err) =>{
             console.log(err);
         });
+    }
+
+    timeZoneOffset(lon,lat){
+      let timeZone;
+      let url = "https://maps.googleapis.com/maps/api/timezone/json?"
+               +"location="+lon+","+lat+"&"
+               +"timestamp=0&sensor=false";
+      let json = $.ajax({
+
+        type: "GET",
+        url:url,
+        async: false,
+        success: (json) => {
+          timeZone = json.rawOffset;
+        },
+        error: (err) => {
+          console.log(err);
+        }
+      });
+      return timeZone;
     }
 }

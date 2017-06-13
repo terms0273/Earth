@@ -21,9 +21,8 @@ export default class OneDayWeatherForecast{
       //成功したときの処理
       console.log(json);
       //メンバー変数の初期化
-      this.timeZone = this.timeZoneOffset(weather.lat,weather.lon) * 1000;
-      console.log(this.timeZone);
-      this.date = new Date(Date.now() + this.timeZone);
+      this.weather = weather;
+      this.date = new Date(Date.now() + this.weather.timeZone);
       this.sunrise = weather.sunrise;
       this.sunset = weather.sunset;
       this.json = json;
@@ -83,10 +82,10 @@ export default class OneDayWeatherForecast{
     this.forecastList = [];
     this.notDataCount = 0;
 
-    let date = new Date(dt * 1000 + this.timeZone);
+    let date = new Date(dt * 1000 + this.weather.timeZone);
     date.setUTCHours(0);
     //21時から24時の間が次の日判定になってしまうため - 1をする
-    let tempDate = new Date(this.json.list[0].dt * 1000 + this.timeZone - 1);
+    let tempDate = new Date(this.json.list[0].dt * 1000 + this.weather.timeZone - 1);
     //今日か今日以外か
     if(date.getUTCDate() === tempDate.getUTCDate()){
       //表示しないアイコン数
@@ -108,7 +107,7 @@ export default class OneDayWeatherForecast{
       while(count < 8){
         let forecast = this.json.list[i++];
         let temp = date.getTime() / 1000 + 1;
-        if(forecast.dt + this.timeZone / 1000 >= temp){
+        if(forecast.dt + this.weather.timeZone / 1000 >= temp){
           this.forecastList.push(forecast);
           count++;
         }
@@ -122,7 +121,7 @@ export default class OneDayWeatherForecast{
     let dateFormat = require('dateformat');
     let now = tag.append("g");
     now.selectAll("text")
-      .data([this.forecastList[0]])
+      .data([this.forecastList[this.notDataCount]])
       .enter()
       .append("text")
       .attr({
@@ -130,7 +129,7 @@ export default class OneDayWeatherForecast{
         y:20
       })
       .text((d) => {
-        return dateFormat(new Date(d.dt * 1000 - 1 + this.timeZone)
+        return dateFormat(new Date(d.dt * 1000 - 1 + this.weather.timeZone)
                .toUTCString(),"UTC:m/d(ddd)");
       });
     return now;
@@ -149,14 +148,14 @@ export default class OneDayWeatherForecast{
       .duration(500)
       .ease("linear")
       .attr({
-        x:(d,i) => {return Math.cos(this.rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * this.radius},
-        y:(d,i) => {return Math.sin(this.rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * this.radius},
+        x:(d,i) => {return Math.cos(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * this.radius},
+        y:(d,i) => {return Math.sin(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * this.radius},
         href:(d) => {
           if(typeof d.weather === "undefined"){
             return "/assets/images/finished-icon.png";
           }else{
             let dn = "d";
-            if(!this.isSun(d.dt + this.timeZone / 1000)){
+            if(!this.isSun(d.dt + this.weather.timeZone / 1000)){
               dn = "n";
             }
             let iconName = d.weather[0].icon
@@ -183,15 +182,15 @@ export default class OneDayWeatherForecast{
       .ease("linear")
       .attr({
         x:(d,i) => {
-          return Math.cos(this.rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 3;
+          return Math.cos(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 3;
         },
         y:(d,i) => {
-          return Math.sin(this.rScale(new Date(d.dt * 1000 + this.timeZone).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 30;
+          return Math.sin(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 30;
         }
       })
       .text((d,i) => {
         var dateFormat = require('dateformat');
-        return new Date(d.dt * 1000 + this.timeZone).getUTCHours() + ":00";
+        return new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours() + ":00";
       });
     return text;
   }
@@ -215,7 +214,7 @@ export default class OneDayWeatherForecast{
                  * (this.radius - 50);
         },
         href: () => {
-          let tempDate = new Date(this.forecastList[0].dt * 1000 + this.timeZone - 1);
+          let tempDate = new Date(this.forecastList[0].dt * 1000 + this.weather.timeZone - 1);
           if(this.date.getUTCDate() !== tempDate.getUTCDate()){
             return null;
           }else if(this.isSun(this.date.getTime() / 1000)){
@@ -265,7 +264,7 @@ export default class OneDayWeatherForecast{
       .innerRadius(function(d){return 20;})
       .outerRadius(function(d){return radius + 20;});
 
-    let temp = new Date(risedt * 1000 + this.timeZone);
+    let temp = new Date(risedt * 1000 + this.weather.timeZone);
     let riseSecond =
       temp.getUTCHours() * 3600 + temp.getUTCMinutes() * 60 + temp.getUTCSeconds();
     let circleGraph = tag.append("g");
@@ -300,38 +299,21 @@ export default class OneDayWeatherForecast{
       });
     return circleGraph;
   }
+
   /*
    *緯度、経度を入れるとoffsetを返す
    *return offset秒単位
    */
-  timeZoneOffset(lon,lat){
-    let timeZone;
-    let url = "https://maps.googleapis.com/maps/api/timezone/json?"
-             +"location="+lon+","+lat+"&"
-             +"timestamp=0&sensor=false";
-    let json = $.ajax({
 
-      type: "GET",
-      url:url,
-      async: false,
-      success: (json) => {
-        timeZone = json.rawOffset;
-      },
-  		error: (err) => {
-  			console.log(err);
-  		}
-    });
-    return timeZone;
-  }
   /*
    *指定された時刻が太陽か月かを判断する
    */
   isSun(dt){
     let temp = new Date(dt * 1000);
     let minutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
-    temp = new Date(this.sunrise * 1000 + this.timeZone);
+    temp = new Date(this.sunrise * 1000 + this.weather.timeZone);
     let riseMinutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
-    temp = new Date(this.sunset * 1000 + this.timeZone);
+    temp = new Date(this.sunset * 1000 + this.weather.timeZone);
     let setMinutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
 
     if(riseMinutes > setMinutes){
