@@ -8,9 +8,6 @@ export default class OneDayWeatherForecast{
    *そしてprint()を呼び出す
    */
   init(weather){
-
-
-    //TODO:朝9時まではすべて夜になってしまうバグを治す
     //現在の日付の時間を変更する デバッグ用コメント
     //this.date.setHours(3);
 
@@ -73,16 +70,7 @@ export default class OneDayWeatherForecast{
     this.forecastIconPrint(rotated);
     this.timeTextPrint(rotated);
     this.nowIconPrint(translated);
-
-    //真ん中に点をつける
-    let center = translated.append("circle")
-      .attr({
-        cx:()=>{return 25;},
-        cy:()=>{return 25;},
-        r:2,
-        fill:"orange"
-      });
-
+    this.pointPrint(translated);
     this.pieGraphPrint(translated);
   }
 
@@ -238,6 +226,17 @@ export default class OneDayWeatherForecast{
         }
       });
     return nowIcon;
+  }
+  //真ん中に点をつける
+  pointPrint(tag){
+    let center = tag.append("circle");
+      center.attr({
+        cx:()=>{return 25;},
+        cy:()=>{return 25;},
+        r:2,
+        fill:"orange"
+      });
+    return center;
   }
   //円グラフで日の出、日没を表現する
   pieGraphPrint(tag){
