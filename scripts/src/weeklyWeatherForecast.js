@@ -70,7 +70,13 @@ export default class WeeklyWeatherForecast {
 
     let dataset = [];
     for (let i = 0; i < this.json.list.length; i++) {
-      dataset[i] = this.json.list[i];
+      let date = this.json.list[i].dt * 1000 + weather.timeZone;
+      let now = new Date(Date.now() + weather.timeZone);
+      now.setUTCHours(0);
+      now = now.getTime()
+      if(date > now) {
+        dataset.push(this.json.list[i]);
+      }
     }
     console.log(oneDay.timeZone);
 
