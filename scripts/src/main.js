@@ -9,7 +9,8 @@ $(function() {
   let map = new Map();
   let graph = new Graph();
   let oneDay = new OneDayWeatherForecast();
-  let weekly = new WeeklyWeatherForecast(oneDay);
+  let weekly;
+  setTimeout(()=>{weekly = new WeeklyWeatherForecast(weather,oneDay);}, 500);
 
   //検索ボタン押したときに呼ぶ
   $("#search-city").click(updateWeather);
@@ -39,7 +40,7 @@ $(function() {
     let newCity = $("#input-city").val();
     weather.send(newCity,map);
     setTimeout(function(){graph.init(weather.city)}, 500);
-    setTimeout(()=>{weekly.init(weather.city,oneDay);}, 500);
+    setTimeout(()=>{weekly.init(weather,oneDay);}, 500);
     setTimeout(()=>{oneDay.init(weather);}, 500);
   };
 });
