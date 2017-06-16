@@ -1,8 +1,10 @@
 import * as d3 from "d3";
+import OneDayWeatherForecast from "./oneDayWeatherForecast";
+import {timeZoneOffset} from "./oneDayWeatherForecast";
 
 export default class WeeklyWeatherForecast {
-  constructor() {
-    this.init("Tokyo");
+  constructor(weather,oneDay) {
+    this.init(weather,oneDay);
   }
 
   /**
@@ -10,10 +12,9 @@ export default class WeeklyWeatherForecast {
    * print()の呼び出し
    * @param  cityName
    */
-  init(cityName) {
-    d3.select("#weekly").select("svg").remove();
+  init(weather,oneDay) {
     let url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" +
-    cityName +
+    weather.city +
     "&appid=9ab6492bf227782c3c7ae7417a624014";
 
     $.ajax({
@@ -21,7 +22,8 @@ export default class WeeklyWeatherForecast {
     }).then((json) =>{
       console.log(json);
       this.json = json;
-      this.print();
+      this.weather = weather;
+      this.print(oneDay);
     },(err) =>{
       console.log(err);
     });
@@ -30,10 +32,12 @@ export default class WeeklyWeatherForecast {
   /**
    * 週間天気予報表示
    */
-  print() {
+  print(oneDay) {
+    d3.select("#weekly > svg").remove();
+    let weather = this.weather;
     let w = 850;
     let h = 200;
-    let padding = 25;
+    let padding = 35;
 
     //曜日表示用配列
     let day = [];
@@ -66,8 +70,15 @@ export default class WeeklyWeatherForecast {
 
     let dataset = [];
     for (let i = 0; i < this.json.list.length; i++) {
-      dataset[i] = this.json.list[i];
+      let date = this.json.list[i].dt * 1000 + weather.timeZone;
+      let now = new Date(Date.now() + weather.timeZone);
+      now.setUTCHours(0);
+      now = now.getTime()
+      if(date > now) {
+        dataset.push(this.json.list[i]);
+      }
     }
+    console.log(oneDay.timeZone);
 
     let xScale = d3.scale.linear()
       .domain([0,dataset.length])
@@ -98,17 +109,27 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[0];}
       })
       .text(function(d) {
-        let date = new Date(d.dt * 1000);
-        return (date.getMonth() + 1) + "/" +
-                date.getDate() +
-                "(" + day[date.getDay()] + ")";
+        let dateFormat = require('dateformat');
+        let date = new Date(d.dt * 1000 + weather.timeZone);
+        return dateFormat(date.toUTCString(),"UTC:m/d(ddd)");
       });
 
     //週間天気予報の天気アイコン表示
-    weekly.append("image")
+    this.image = weekly.append("image");
       //on click 未実装
-      .on("click", function(d,i) {
 
+    this.image
+      .on("click", function(d,i) {
+        console.log(d.dt);
+        oneDay.updateForecastList(d.dt);
+        console.log(d.dt);
+        oneDay.print();
+      })
+      .on("mouseover", function() {
+        d3.select(this).attr("cursor", "pointer");
+      })
+      .on("mouseout", function() {
+        d3.select(this).attr("cursor", "default");
       })
       .transition()
       .duration(1000)
@@ -125,7 +146,7 @@ export default class WeeklyWeatherForecast {
         href: function(d){
           return 'http://openweathermap.org/img/w/'+d.weather[0].icon+'.png';
         },
-        x: function(d,i){return xScale(i) + 70;},
+        x: function(d,i){return xScale(i) + 85;},
         y: function() {return yPoint[1];}
       });
 
@@ -136,7 +157,7 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[2];}
       })
       .text(function(d) {
-        return new Number(d.temp.max - 273.15).toFixed(1);
+        return new Number(d.temp.max - 273.15).toFixed(1) + "℃";
       });
 
     //週間天気予報の最低気温表示
@@ -146,7 +167,7 @@ export default class WeeklyWeatherForecast {
         y: function() {return yPoint[3];}
       })
       .text(function(d) {
-        return new Number(d.temp.min - 273.15).toFixed(1);
+        return new Number(d.temp.min - 273.15).toFixed(1) + "℃";
       });
   }
 }

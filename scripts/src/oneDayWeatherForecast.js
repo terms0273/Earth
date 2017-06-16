@@ -8,25 +8,25 @@ export default class OneDayWeatherForecast{
    *そしてprint()を呼び出す
    */
   init(weather){
-
-    d3.select("#one-day svg").remove();
-
-    //メンバー変数の初期化
-    this.date = new Date();
     //現在の日付の時間を変更する デバッグ用コメント
     //this.date.setHours(3);
-    this.sunrise = weather.sunrise;
-    this.sunset = weather.sunset;
 
     let url = "http://api.openweathermap.org/data/2.5/forecast?q=" +
-    weather.cityName +
-    "&appid=9ab6492bf227782c3c7ae7417a624014";
+      weather.city +
+      "&appid=9ab6492bf227782c3c7ae7417a624014";
+
     $.ajax({
       url:url
     }).then((json) =>{
       //成功したときの処理
       console.log(json);
+      //メンバー変数の初期化
+      this.weather = weather;
+      this.date = new Date(Date.now() + this.weather.timeZone);
+      this.sunrise = weather.sunrise;
+      this.sunset = weather.sunset;
       this.json = json;
+      this.updateForecastList(json.list[0].dt - 1);
       this.print();
     },
       (err) =>{
@@ -39,52 +39,139 @@ export default class OneDayWeatherForecast{
    *1日の詳細の天気予報を表示する
    */
   print(){
+    d3.select("#one-day > svg").remove();
 
-    let width = 760;
-    let height = 350;
-    let radius = 100;
-    let margin = 50;
+    this.width = 760;
+    this.height = 350;
+    this.radius = 100;
+    this.margin = 50;
 
     let svg = d3.select("#one-day").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+      .attr("width", this.width)
+      .attr("height", this.height);
 
     // translateで画面中央に移動。
     let translated = svg.append("g")
       .attr("transform","translate("
-        + (radius + margin) +","
-        + (radius + margin) +")"
+        + (this.radius + this.margin) +","
+        + (this.radius + this.margin + 20) +")"
       );
 
-    //データの初期化
-    let data = [];
-    //表示しないアイコン数
-    let notDataCount = new Date(this.json.list[0].dt * 1000).getHours() / 3 - 1;
-    //21時以降だと-1になってしまうので
-    if(notDataCount == -1){
-      notDataCount = 7
-    }
-    for(let i = 0; i < notDataCount; i++){
-      data.push(null);
-    }
-    for(let i = 0; i < 8 - notDataCount; i++){
-      data.push(this.json.list[i]);
-    }
-
     // 360度になるように均等に角度を割りふる。
-    let rScale = d3.scale.linear()
-      .domain([0,data.length])
-      .range([135,495]);
+    this.rScale = d3.scale.linear()
+      .domain([0,24])
+      .range([90,450]);
 
-    let rotated = translated.selectAll("g").data(data).enter()
-      .append("g");
+    this.datePrint(svg);
 
-    //天気予報のアイコンを表示する
-    let image = rotated.append("image")
+    let pieGraph = translated.append("g");
+    let rotated = translated.selectAll("rotated")
+                    .data(this.forecastList).enter()
+    .append("g");
+
+    this.forecastIconPrint(rotated);
+    this.timeTextPrint(rotated);
+    this.nowIconPrint(translated);
+    this.pointPrint(translated);
+    this.pieGraphPrint(pieGraph);
+  }
+
+  /*
+   *日付をもらいForecastListを更新し
+   *dt:秒単位
+   */
+  updateForecastList(dt){
+    //データの初期化
+    this.forecastList = [];
+    this.notDataCount = 0;
+
+    let date = new Date(dt * 1000 + this.weather.timeZone);
+    date.setUTCHours(0);
+    //21時から24時の間が次の日判定になってしまうため - 1をする
+    let tempDate = new Date(this.json.list[0].dt * 1000 +
+                            this.weather.timeZone - 1);
+    //今日か今日以外か
+    if(date.getUTCDate() === tempDate.getUTCDate()){
+      //表示しないアイコン数
+      this.notDataCount = Math.ceil(tempDate.getUTCHours() / 3 - 1);
+      //21時以降だと-1になってしまうので
+      if(this.notDataCount == -1){
+        this.notDataCount = 7;
+      }
+      for(let i = 0; i < this.notDataCount; i++){
+        let forwardDt = this.json.list[0].dt - (3600 * 3) *
+                        (this.notDataCount - i);
+        this.forecastList.push({"dt":forwardDt});
+      }
+      for(let i = 0; i < 8 - this.notDataCount; i++){
+        this.forecastList.push(this.json.list[i]);
+      }
+    }else{
+      let i = 0;
+      let count = 0;
+      while(count < 8){
+        let forecast = this.json.list[i++];
+        let temp = date.getTime() / 1000 + 1;
+        if(forecast.dt + this.weather.timeZone / 1000 >= temp){
+          this.forecastList.push(forecast);
+          count++;
+        }
+      }
+    }
+    console.log(this.forecastList);
+  }
+
+  //日付を表示する
+  datePrint(tag){
+    let dateFormat = require('dateformat');
+    let now = tag.append("g");
+    now.selectAll("text")
+      .data([this.forecastList[this.notDataCount]])
+      .enter()
+      .append("text")
       .attr({
+        x:this.radius + this.margin,
+        y:20
+      })
+      .text((d) => {
+        return dateFormat(new Date(d.dt * 1000 - 1 + this.weather.timeZone)
+               .toUTCString(),"UTC:m/d(ddd)");
+      });
+    return now;
+  }
+  //天気予報のアイコンを表示する
+  forecastIconPrint(tag){
+    let tooltip = d3.select("body").select("#tooltip");
+    let image = tag.append("image");
+    image.attr({
         x:0,
         y:0
       })
+      .on("mouseover", function(d){
+        let data = "";
+        if(typeof d.rain !== "undefined"){
+          let precipitation = 0;
+          if(typeof d.rain["3h"] !== "undefined"){
+            precipitation = d.rain["3h"] ;
+          }
+          data="<br>precipitation：" + precipitation + "(mm)";
+        }else if(typeof d.snow !== "undefined"){
+          let snow = 0;
+          if(typeof d.snow["3h"] !== "undefined"){
+            snow = d.snow["3h"] ;
+          }
+          data="<br>snow：" +snow + "(cm)";
+        }
+
+        let text =
+           "description&nbsp;&nbsp;：" + d.weather[0].description
+          + data;
+        return tooltip.style("visibility", "visible").html(text);})
+      .on("mousemove", function(d){
+        return tooltip.style("top",
+              (event.pageY-20)+"px").style("left",(event.pageX+10)+"px");
+      })
+      .on("mouseout", function(d){return tooltip.style("visibility", "hidden")})
       .transition()
       .delay((d,i) => {
         return i * 50;
@@ -92,24 +179,37 @@ export default class OneDayWeatherForecast{
       .duration(500)
       .ease("linear")
       .attr({
-        x:(d,i) => {return Math.cos(rScale(i) * Math.PI / 180) * radius},
-        y:(d,i) => {return Math.sin(rScale(i) * Math.PI / 180) * radius},
+        x:(d,i) => {
+          return Math.cos(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                ).getUTCHours()) * Math.PI / 180) * this.radius
+        },
+        y:(d,i) => {
+          return Math.sin(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                ).getUTCHours()) * Math.PI / 180) * this.radius
+        },
         href:(d) => {
-          if(d === null){
+          if(typeof d.weather === "undefined"){
             return "/assets/images/finished-icon.png";
           }else{
-            return "http://openweathermap.org/img/w/"+d.weather[0].icon+".png";
+            let dn = "d";
+            if(!this.isSun(d.dt + this.weather.timeZone / 1000)){
+              dn = "n";
+            }
+            let iconName = d.weather[0].icon
+                          .slice(0,d.weather[0].icon.length - 1)
+                          + dn;
+            return "http://openweathermap.org/img/w/"+iconName+".png";
           }
         }
       });
-
-    //時間をテキストで表示する 例）21:00
-    let nowScale = d3.scale.linear()
-      .domain([0,24])
-      .range([90,450]);
-
-    let text = rotated.append("text")
-      .attr({
+    return image;
+  }
+  //時間テキストを表示する
+  timeTextPrint(tag){
+    let text = tag.append("text");
+    text.attr({
         x:0,
         y:0
       })
@@ -121,51 +221,79 @@ export default class OneDayWeatherForecast{
       .ease("linear")
       .attr({
         x:(d,i) => {
-          return Math.cos(rScale(i) * Math.PI / 180) * (radius + 40) + 3;
+          return Math.cos(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                  ).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 3;
         },
         y:(d,i) => {
-          return Math.sin(rScale(i) * Math.PI / 180) * (radius + 40) + 30;
+          return Math.sin(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                  ).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 30;
         }
       })
-      .text((d,i) => {return (i * 3 + 3  % 24) + ":00";});
-
-    //現在の太陽or月を表示する
-    let nowIcon = translated.append("image")
-      .attr({
+      .text((d,i) => {
+        return new Date(d.dt * 1000 + this.weather.timeZone)
+                .getUTCHours() + ":00";
+      });
+    return text;
+  }
+  //現在の太陽or月を表示する
+  nowIconPrint(tag){
+    let now = this.date;
+    let tooltip = d3.select("body").select("#tooltip");
+    let nowIcon = tag.append("image");
+    nowIcon.attr({
         x:0,
         y:0
       })
+      .on("mouseover", function(d){
+        let dateFormat = require('dateformat');
+        return tooltip.style("visibility", "visible")
+                .text( "TIME "+ dateFormat(new Date(now),"UTC:HH:MM"));})
+      .on("mousemove", function(d){
+        return tooltip.style("top", (event.pageY-20)+"px")
+                .style("left",(event.pageX+10)+"px");
+      })
+      .on("mouseout", function(d){return tooltip.style("visibility", "hidden")})
       .transition()
       .duration(500)
       .ease("linear")
       .attr({
         x:() => {
-          return Math.cos(nowScale(this.date.getHours()) * Math.PI / 180)
-                 * (radius - 50);
+          return Math.cos(this.rScale(this.date.getUTCHours()) * Math.PI / 180)
+                 * (this.radius - 50);
         },
         y:() => {
-          return Math.sin(nowScale(this.date.getHours()) * Math.PI / 180)
-                 * (radius - 50);
+          return Math.sin(this.rScale(this.date.getUTCHours()) * Math.PI / 180)
+                 * (this.radius - 50);
         },
         href: () => {
-          if(this.isSun()){
+          let tempDate = new Date(this.forecastList[0].dt * 1000
+                          + this.weather.timeZone - 1);
+          if(this.date.getUTCDate() !== tempDate.getUTCDate()){
+            return null;
+          }else if(this.isSun(this.date.getTime() / 1000)){
             return "http://openweathermap.org/img/w/01d.png";
           }else{
             return "http://openweathermap.org/img/w/01n.png";
           }
         }
       });
-
-    //真ん中に点をつける
-    let center = translated.append("circle")
-      .attr({
+    return nowIcon;
+  }
+  //真ん中に点をつける
+  pointPrint(tag){
+    let center = tag.append("circle");
+      center.attr({
         cx:()=>{return 25;},
         cy:()=>{return 25;},
         r:2,
         fill:"orange"
       });
-
-    //円グラフで日の出、日没を表現する
+    return center;
+  }
+  //円グラフで日の出、日没を表現する
+  pieGraphPrint(tag){
     let risedt =this.sunrise;
     let setdt = this.sunset;
     let deySecond = 24 * 60 * 60;
@@ -183,17 +311,19 @@ export default class OneDayWeatherForecast{
 
     //合計値を算出する上でのラムダ．
     let actGettingScore = function(d){return d.score;};
-    //arcオブジェクトは扇形に相当するd操作を生成する．
+    //arcオブジェクトは扇形に相当するd操作を生成する
+    let radius = this.radius;
     let arc = d3.svg.arc()
       .startAngle(function(d){return 0;})
       .endAngle(function(d){return Math.PI * 2 * d.score/ deySecond;})
       .innerRadius(function(d){return 20;})
       .outerRadius(function(d){return radius + 20;});
 
-    let temp = new Date(risedt * 1000);
+    let temp = new Date(risedt * 1000 + this.weather.timeZone);
     let riseSecond =
-      temp.getHours() * 3600 + temp.getMinutes() * 60 + temp.getSeconds();
-    let circleGraph = translated.append("g");
+      temp.getUTCHours() * 3600 + temp.getUTCMinutes()
+        * 60 + temp.getUTCSeconds();
+    let circleGraph = tag.append("g");
     circleGraph.selectAll("path")
       .data(dataArr)
       .enter()
@@ -223,14 +353,30 @@ export default class OneDayWeatherForecast{
         stroke: "white",
         fill: (d,i) => {return "rgba("+colors[i]+", 0.1)";}
       });
+    return circleGraph;
   }
 
   /*
-   *太陽か月かを判断する
+   *緯度、経度を入れるとoffsetを返す
+   *return offset秒単位
    */
-  isSun(){
-    let dt = this.date.getTime() / 1000;
-    if(this.sunrise <= dt && dt <= this.sunset){
+
+  /*
+   *指定された時刻が太陽か月かを判断する
+   */
+  isSun(dt){
+    let temp = new Date(dt * 1000);
+    let minutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
+    temp = new Date(this.sunrise * 1000 + this.weather.timeZone);
+    let riseMinutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
+    temp = new Date(this.sunset * 1000 + this.weather.timeZone);
+    let setMinutes = temp.getUTCHours() * 60 + temp.getUTCMinutes();
+
+    if(riseMinutes > setMinutes){
+      setMinutes += 24 * 60;
+    }
+
+    if(riseMinutes <= minutes && minutes <= setMinutes){
       return true;
     }
     return false;

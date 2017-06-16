@@ -1,6 +1,6 @@
 @(loginForm: Form[models.Account])
 @main("Main") {
-
+  <span id="tooltip"></span>
     <div class="uk-margin" uk-grid>
         <div class="uk-width-auto">
             <div id="side" class="uk-margin-left uk-padding-small">
@@ -100,9 +100,9 @@
                       </div>
                     </div>
                     <ul uk-tab>
-                      <li class="uk-active"><a href="#">Map</a></li>               
-                      <li><a id="tab-graph" href="#">Graph</a></li>
-                      <li><a id="tab-weather-forecast"href="#">Weather Forecast</a></li>
+                      <li class="uk-active"><a href="#">Map</a></li>
+                      <li><a id="tag-graph" href="#">Graph</a></li>
+                      <li><a id="tab-weather-forecast" href="#">Weather Forecast</a></li>
                     </ul>
                     <div class="tab-contents uk-switcher uk-margin">
                       <li>
@@ -113,10 +113,10 @@
                       <li>
                         <div id="graph">
                           <form id="slctGraph">
-                            <input id="chkTemp" type="checkbox" name="temp" value="1">Temperature
-                            <input id="chkHumide" type="checkbox" name="humide" value="2" >Humidity
-                            <input id="chkTaikan" type="checkbox" name="degree" value="3" >体感温度
-                            <input id="chkFukai" type="checkbox" name="index" value="4" >不快指数
+                            <input id="chkTemp" type="checkbox" name="temp" value="1" ><font color="#ff00ff">Temperature(℃)</font>
+                            <input id="chkHumide" type="checkbox" name="humide" value="2" ><font color="#313198">Humidity(%)</font>
+                            <input id="chkTaikan" type="checkbox" name="degree" value="3" ><font color="#ff6699">Windchill(℃)</font>
+                            <input id="chkFukai" type="checkbox" name="index" value="4" ><font color="#892706">Disconfort Index</font>
                           </form>
                         </div>
                       </li>
@@ -132,5 +132,4 @@
             </div>
         </div>
     </div>
-
 }
