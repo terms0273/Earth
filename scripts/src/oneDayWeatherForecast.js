@@ -65,7 +65,8 @@ export default class OneDayWeatherForecast{
     this.datePrint(svg);
 
     let pieGraph = translated.append("g");
-    let rotated = translated.selectAll("rotated").data(this.forecastList).enter()
+    let rotated = translated.selectAll("rotated")
+                    .data(this.forecastList).enter()
     .append("g");
 
     this.forecastIconPrint(rotated);
@@ -87,7 +88,8 @@ export default class OneDayWeatherForecast{
     let date = new Date(dt * 1000 + this.weather.timeZone);
     date.setUTCHours(0);
     //21時から24時の間が次の日判定になってしまうため - 1をする
-    let tempDate = new Date(this.json.list[0].dt * 1000 + this.weather.timeZone - 1);
+    let tempDate = new Date(this.json.list[0].dt * 1000 +
+                            this.weather.timeZone - 1);
     //今日か今日以外か
     if(date.getUTCDate() === tempDate.getUTCDate()){
       //表示しないアイコン数
@@ -97,7 +99,8 @@ export default class OneDayWeatherForecast{
         this.notDataCount = 7;
       }
       for(let i = 0; i < this.notDataCount; i++){
-        let forwardDt = this.json.list[0].dt - (3600 * 3) * (this.notDataCount - i);
+        let forwardDt = this.json.list[0].dt - (3600 * 3) *
+                        (this.notDataCount - i);
         this.forecastList.push({"dt":forwardDt});
       }
       for(let i = 0; i < 8 - this.notDataCount; i++){
@@ -164,7 +167,10 @@ export default class OneDayWeatherForecast{
            "description&nbsp;&nbsp;：" + d.weather[0].description
           + data;
         return tooltip.style("visibility", "visible").html(text);})
-      .on("mousemove", function(d){return tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+10)+"px");})
+      .on("mousemove", function(d){
+        return tooltip.style("top",
+              (event.pageY-20)+"px").style("left",(event.pageX+10)+"px");
+      })
       .on("mouseout", function(d){return tooltip.style("visibility", "hidden")})
       .transition()
       .delay((d,i) => {
@@ -173,8 +179,16 @@ export default class OneDayWeatherForecast{
       .duration(500)
       .ease("linear")
       .attr({
-        x:(d,i) => {return Math.cos(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * this.radius},
-        y:(d,i) => {return Math.sin(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * this.radius},
+        x:(d,i) => {
+          return Math.cos(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                ).getUTCHours()) * Math.PI / 180) * this.radius
+        },
+        y:(d,i) => {
+          return Math.sin(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                ).getUTCHours()) * Math.PI / 180) * this.radius
+        },
         href:(d) => {
           if(typeof d.weather === "undefined"){
             return "/assets/images/finished-icon.png";
@@ -207,14 +221,19 @@ export default class OneDayWeatherForecast{
       .ease("linear")
       .attr({
         x:(d,i) => {
-          return Math.cos(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 3;
+          return Math.cos(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                  ).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 3;
         },
         y:(d,i) => {
-          return Math.sin(this.rScale(new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 30;
+          return Math.sin(this.rScale(new Date(
+                  d.dt * 1000 + this.weather.timeZone
+                  ).getUTCHours()) * Math.PI / 180) * (this.radius + 40) + 30;
         }
       })
       .text((d,i) => {
-        return new Date(d.dt * 1000 + this.weather.timeZone).getUTCHours() + ":00";
+        return new Date(d.dt * 1000 + this.weather.timeZone)
+                .getUTCHours() + ":00";
       });
     return text;
   }
@@ -229,8 +248,12 @@ export default class OneDayWeatherForecast{
       })
       .on("mouseover", function(d){
         let dateFormat = require('dateformat');
-        return tooltip.style("visibility", "visible").text( "TIME "+ dateFormat(new Date(now),"UTC:HH:MM"));})
-      .on("mousemove", function(d){return tooltip.style("top", (event.pageY-20)+"px").style("left",(event.pageX+10)+"px");})
+        return tooltip.style("visibility", "visible")
+                .text( "TIME "+ dateFormat(new Date(now),"UTC:HH:MM"));})
+      .on("mousemove", function(d){
+        return tooltip.style("top", (event.pageY-20)+"px")
+                .style("left",(event.pageX+10)+"px");
+      })
       .on("mouseout", function(d){return tooltip.style("visibility", "hidden")})
       .transition()
       .duration(500)
@@ -245,7 +268,8 @@ export default class OneDayWeatherForecast{
                  * (this.radius - 50);
         },
         href: () => {
-          let tempDate = new Date(this.forecastList[0].dt * 1000 + this.weather.timeZone - 1);
+          let tempDate = new Date(this.forecastList[0].dt * 1000
+                          + this.weather.timeZone - 1);
           if(this.date.getUTCDate() !== tempDate.getUTCDate()){
             return null;
           }else if(this.isSun(this.date.getTime() / 1000)){
@@ -297,7 +321,8 @@ export default class OneDayWeatherForecast{
 
     let temp = new Date(risedt * 1000 + this.weather.timeZone);
     let riseSecond =
-      temp.getUTCHours() * 3600 + temp.getUTCMinutes() * 60 + temp.getUTCSeconds();
+      temp.getUTCHours() * 3600 + temp.getUTCMinutes()
+        * 60 + temp.getUTCSeconds();
     let circleGraph = tag.append("g");
     circleGraph.selectAll("path")
       .data(dataArr)
