@@ -71,7 +71,7 @@ export default class Graph{
 　  svg.append("g")
       .attr({
         class:"y axis",
-        transform: "translate(padding, 0)"})
+        transform: `translate(${padding}, 0)`})
       .call(yAxis);
 
      let tooltip = d3.select("body").select("#tooltip");
