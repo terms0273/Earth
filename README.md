@@ -1,7 +1,7 @@
 # Introduction
 
 This application has 2 functions.  
-* "GRAPH" - Showing the graph.  
+* "GRAPH" - Plotting the graph.  
 * "WEATHER FORECAST" - Checking the weather forecast for a week.  
 
 There are 3 tabs in a main page.  
