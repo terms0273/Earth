@@ -289,7 +289,7 @@ export default class Graph{
           let a = 1.76 + 1.4*v;
           return yScale(
               0.81*(d.main.temp - 273.15) +
-              0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3;
+              0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3
             );
         });
     }
