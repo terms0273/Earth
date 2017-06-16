@@ -1,4 +1,4 @@
-name := "Earth-Green"
+name := "Earth"
 
 version := "1.0-SNAPSHOT"
 

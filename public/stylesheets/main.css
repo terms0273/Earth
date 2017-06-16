@@ -48,6 +48,51 @@ html{
 .uk-alert-primary{
     background-color: #c8fac8;
 }
+
 .initial-color{
     background: initial !important;
 }
+
+/*
+graph.jsで使うグラフの軸のデザイン設定
+*/
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path {
+/*
+fillとopacityで半透明な背景色。
+*/
+  fill: Aquamarine;
+  opacity: 0.1;
+  stroke: #000;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.axis line {
+  stroke: #000;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.line {
+  fill: none;
+  stroke: DarkGreen;
+  stroke-width: 1.5px;
+}
+
+span#tooltip{
+      position: absolute;
+      z-index: 10;
+      visibility: hidden;
+      padding: 0 5px;
+      border: 1px solid #000;
+      border-radius: 3px;
+      background-color: #333;
+      color: #fff;
+      font-size: 15px;
+      opacity: 0.8;
+    }
+
