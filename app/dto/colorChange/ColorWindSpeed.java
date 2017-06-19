@@ -12,7 +12,7 @@ public class ColorWindSpeed extends ColorChange {
         super.elem = windSpeed + "m/s";
     }
     
-    public void setColorWindSpeed(double windSpeed) {
+    void setColorWindSpeed(double windSpeed) {
         //猛烈な風
         if (windSpeed >= 30.0) {
             super.color = "#ffb3f4";

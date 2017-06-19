@@ -13,7 +13,7 @@ public class ColorTemp extends ColorChange {
         super.elem = temp + "℃";
     }
 
-    public void setColorTemp(double temp) {
+    void setColorTemp(double temp) {
         //猛暑日
         if (temp >= 35.0) {
             super.color = "#ffb3f4";

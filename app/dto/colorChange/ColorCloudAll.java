@@ -12,7 +12,7 @@ public class ColorCloudAll extends ColorChange {
         super.elem = cloudAll + "%";
     }
     
-    public void setColorCloudAll(int cloudAll) {
+    void setColorCloudAll(int cloudAll) {
         if (cloudAll >= 95) {
             super.color = "#ffbeb3";
         } else if (cloudAll >= 85) {
