@@ -2,12 +2,21 @@ import * as d3 from "d3";
 
 export default class Graph{
   constructor(){
-    ;
+    let margin = {top: 20, right: 20, bottom: 30, left: 40};
+    let w = 1000 - margin.left - margin.right;
+    let h = 700 - margin.top - margin.bottom;
+    //svg領域を確保
+    this.svg = d3.select("#graph")
+      .append("svg")
+      .attr("width", w)
+      .attr("height", h)
+      .append("g");
+
   }
 
   //チェックボックスにチェックが入るとこのメソッドが呼ばれる
   init(cityName){
-    d3.select("svg").remove(); //残っているグラフを消して初期化する
+    //d3.select("svg").remove(); //残っているグラフを消して初期化する
     let url = "http://api.openweathermap.org/data/2.5/forecast?q=" +
     cityName +
     "&appid=9ab6492bf227782c3c7ae7417a624014";
@@ -17,6 +26,45 @@ export default class Graph{
     }).then((json) =>{
       //jsonが正しく受け取れているとき
       console.log(json);
+      this.json = json;
+      let forecastlist = json.list;
+      let margin = {top: 20, right: 20, bottom: 30, left: 40};
+      let w = 1000 - margin.left - margin.right;
+      let h = 700 - margin.top - margin.bottom;
+      let padding = 30;
+      let xScale = d3.scale.linear()
+        .domain([forecastlist[0].dt, forecastlist[forecastlist.length-1].dt])
+        .range([padding, w-margin.left]);
+
+      let yScale = d3.scale.linear()
+        .domain([-100, 100])
+        .range([h-padding, padding]);
+
+      //縦軸と横軸の設定
+      let xAxis = d3.svg.axis()
+        .scale(xScale)
+        .orient("bottom")
+        .tickFormat(function(d){
+            let date = new Date(d * 1000);
+            return (date.getMonth() + 1) + "/" +
+                    date.getDate() + "/" + date.getHours() + " :00";
+          });
+      let yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient("left");
+
+      //svg領域に縦軸と横軸を描く
+      this.svg.append("g")
+        .attr({
+          class:"x axis",
+          transform: "translate(0, 630)"})
+        .call(xAxis);
+  　  this.svg.append("g")
+        .attr({
+          class:"y axis",
+          transform: `translate(${padding}, 0)`})
+        .call(yAxis);
+
       this.print(json);//下でprintメソッドを定義している
     },(err) =>{
       console.log(err);
@@ -24,9 +72,9 @@ export default class Graph{
   }
 
   //jsonから正しくデータが受け取れているときに呼ばれるメソッド
-  print(json){
+  print(){
     //jsonからリストを受け取る
-    let forecastlist = json.list;
+    let forecastlist = this.json.list;
     //画面レイアウトの設定
     let margin = {top: 20, right: 20, bottom: 30, left: 40};
     let w = 1000 - margin.left - margin.right;
@@ -42,39 +90,7 @@ export default class Graph{
       .domain([-100, 100])
       .range([h-padding, padding]);
 
-    //svg領域を確保
-    let svg = d3.select("#graph")
-      .append("svg")
-      .attr("width", w)
-      .attr("height", h)
-      .append("g");
-
-    //縦軸と横軸の設定
-    let xAxis = d3.svg.axis()
-      .scale(xScale)
-      .orient("bottom")
-      .tickFormat(function(d){
-          let date = new Date(d * 1000);
-          return (date.getMonth() + 1) + "/" +
-                  date.getDate() + "/" + date.getHours() + " :00";
-        });
-    let yAxis = d3.svg.axis()
-      .scale(yScale)
-      .orient("left");
-
-    //svg領域に縦軸と横軸を描く
-    svg.append("g")
-      .attr({
-        class:"x axis",
-        transform: "translate(0, 630)"})
-      .call(xAxis);
-　  svg.append("g")
-      .attr({
-        class:"y axis",
-        transform: `translate(${padding}, 0)`})
-      .call(yAxis);
-
-     let tooltip = d3.select("body").select("#tooltip");
+    let tooltip = d3.select("body").select("#tooltip");
 
     /*ここまではグラフの共通部分
     ここから4つのグラフにチェックボックスのチェック有無で分岐
@@ -89,7 +105,8 @@ export default class Graph{
         .interpolate("cardinal");//線の種類。cardinalは曲線
 
       //用意した線を描画
-      svg.append("path")
+      let a = this.svg.append("g").attr("id", "temp");
+      a.selectAll("g").append("path")
         .attr("d", d3line(forecastlist))
         .attr({
           transform: "translate(0, 0)"})
@@ -98,7 +115,7 @@ export default class Graph{
         .style("fill", "none");
 
       //気温を示す点を描画
-      let circle = svg.selectAll("circle")
+      let circle = a.selectAll("circle")
         .data(forecastlist)
         .enter()
         .append("circle")
@@ -126,6 +143,8 @@ export default class Graph{
       .duration(1000)
       .ease("bounce")
       .attr("cy", function(d){return yScale(d.main.temp-273.15);});
+    }else{
+      d3.select("#temp").remove();
     }
 
     //以下気温チェック参照。同じ手順で行っている。
@@ -137,7 +156,8 @@ export default class Graph{
         .y(function(d){return yScale(d.main.humidity);})
         .interpolate("linear");
 
-      svg.append("path")
+      let b = this.svg.append("g").attr("id", "humidity");
+      b.append("path")
         .attr("d", d3line(forecastlist))
         .attr({
           transform: "translate(0, 0)"})
@@ -146,7 +166,7 @@ export default class Graph{
         .style("fill", "none");
 
 
-      let circle = svg.selectAll("circle2")
+      let circle = b.selectAll("circle2")
         .data(forecastlist)
         .enter()
         .append("circle")
@@ -174,6 +194,8 @@ export default class Graph{
         .duration(1000)
         .ease("bounce")
         .attr("cy", function(d){return yScale(d.main.humidity);});
+    }else{
+      d3.select("#humidity").remove();
     }
 
     //体感温度チェック
@@ -188,7 +210,7 @@ export default class Graph{
         })
         .interpolate("cardinal");
 
-      svg.append("path")
+      this.svg.append("path")
         .attr("d", d3line(forecastlist))
         .attr({
           transform: "translate(0, 0)"})
@@ -196,7 +218,7 @@ export default class Graph{
         .style("stroke", "ff6699")
         .style("fill", "none");
 
-      let circle = svg.selectAll("circle3")
+      let circle = this.svg.selectAll("circle3")
         .data(forecastlist)
         .enter()
         .append("circle")
@@ -246,7 +268,7 @@ export default class Graph{
         .interpolate("cardinal");
 
 
-      svg.append("path")
+      this.svg.append("path")
         .attr("d", d3line(forecastlist))
         .attr({
           transform: "translate(0, 0)"})
@@ -255,7 +277,7 @@ export default class Graph{
         .style("fill", "none");
 
 
-      let circle = svg.selectAll("circle4")
+      let circle = this.svg.selectAll("circle4")
         .data(forecastlist)
         .enter()
         .append("circle")
