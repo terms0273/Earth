@@ -23,8 +23,8 @@ $(function() {
     }
   });
   //チェックボックスにチェック
-  $(":checkbox").click(()=>{
-    graph.print();
+  $(":checkbox").click((e)=>{
+    graph.print(e.target.id);
   });
 
   //エンターボタンで検索動作

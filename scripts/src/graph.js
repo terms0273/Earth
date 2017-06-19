@@ -65,14 +65,13 @@ export default class Graph{
           transform: `translate(${padding}, 0)`})
         .call(yAxis);
 
-      this.print(json);//下でprintメソッドを定義している
     },(err) =>{
       console.log(err);
     });
   }
 
   //jsonから正しくデータが受け取れているときに呼ばれるメソッド
-  print(){
+  print(id){
     //jsonからリストを受け取る
     let forecastlist = this.json.list;
     //画面レイアウトの設定
