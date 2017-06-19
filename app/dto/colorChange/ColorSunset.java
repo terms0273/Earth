@@ -5,12 +5,14 @@
  */
 package dto.colorChange;
 
+import java.util.Date;
+
 /**
  *
  * @author a-yamamoto
  */
 public class ColorSunset extends ColorChange {
-    public ColorSunset(String sunset) {
-        super.elem = sunset;
+    public ColorSunset(Date sunset) {
+        super.elem = sunset + "";
     }
 }

@@ -5,12 +5,14 @@
  */
 package dto.colorChange;
 
+import java.util.Date;
+
 /**
  *
  * @author a-yamamoto
  */
 public class ColorSunrise extends ColorChange {
-    public ColorSunrise(String sunrise) {
-        super.elem = sunrise;
+    public ColorSunrise(Date sunrise) {
+        super.elem = sunrise + "";
     }
 }
