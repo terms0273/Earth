@@ -22,7 +22,7 @@ public class ColorDI extends ColorChange {
     /**
      * 不快指数を色分けして表示する http://keisan.casio.jp/exec/system/1202883065　参照
      */
-    public void setColorDI(double DI) {
+    void setColorDI(double DI) {
         // 暑くてたまらない
         if (DI >= 85.0) {
             super.color = "#E4B3FF";

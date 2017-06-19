@@ -12,7 +12,7 @@ public class ColorHumidity extends ColorChange {
         super.elem = humidity + "%";
     }
     
-    public void setColorHumidity(int humidity) {
+   void setColorHumidity(int humidity) {
         if (humidity >= 90) {
             super.color = "#ffbeb3";
         } else if (humidity >= 80) {
