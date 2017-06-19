@@ -43,6 +43,11 @@ public class WL {
         List<ColorChange> pressure = new ArrayList<ColorChange>();
         List<ColorChange> humidity = new ArrayList<ColorChange>();
         List<ColorChange> DI = new ArrayList<ColorChange>();
+        List<ColorChange> lat = new ArrayList<ColorChange>();
+        List<ColorChange> lon = new ArrayList<ColorChange>();
+        List<ColorChange> sunrise = new ArrayList<ColorChange>();
+        List<ColorChange> sunset = new ArrayList<ColorChange>();        
+        
         for (Weather l : list) {
             DateFormat timestampFormat1 = new SimpleDateFormat("HH:mm");
             str1.add(timestampFormat1.format(l.dt));
@@ -54,7 +59,10 @@ public class WL {
             pressure.add(new ColorPressure(l.pressure));
             humidity.add(new ColorHumidity(l.humidity));
             DI.add(new ColorDI(l.temp, l.humidity));
-
+            lat.add(new ColorLat(l.lat));
+            lon.add(new ColorLon(l.lon));
+            sunrise.add(new ColorSunrise(l.sunrise));
+            sunset.add(new ColorSunset(l.sunset));
         }
         map.put("ICON", icon);
         map.put("WEATHER", main);
@@ -64,7 +72,10 @@ public class WL {
         map.put("WIND-SPEED", windSpeed);
         map.put("PRESSURE", pressure);
         map.put("CLOUD-ALL", cloudAll);
-
+        map.put("LAT", lat);
+        map.put("LON", lon);
+        map.put("SUNRISE",sunrise);
+        map.put("SUNSET", sunset);
     }
     public Map<String, List<ColorChange>> map;
 }
