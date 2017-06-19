@@ -11,6 +11,6 @@ package dto.colorChange;
  */
 public class ColorLan extends ColorChange {
     public ColorLan(double lan) {
-        
+        super.elem = lan + "";
     }
 }

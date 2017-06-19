@@ -11,6 +11,6 @@ package dto.colorChange;
  */
 public class ColorSunrise extends ColorChange {
     public ColorSunrise(String sunrise) {
-        
+        super.elem = sunrise;
     }
 }

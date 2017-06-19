@@ -11,7 +11,7 @@ package dto.colorChange;
  */
 public class ColorLat extends ColorChange {
     public ColorLat(double lat) {
-        
+        super.elem = lat + "";
     }
     
 }
