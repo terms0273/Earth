@@ -200,123 +200,207 @@ export default class Graph{
 
     //体感温度チェック
     if($("#chkTaikan:checked").val()){
-      let d3line = d3.svg.line()
-        .x(function(d){return xScale(d.dt);})
-        .y(function(d){
-          let v = Math.pow(d.wind.speed, 0.75);//風速を0.75乗
-          let a = 1.76 + 1.4*v;
-          return yScale(37-(37-(d.main.temp-273.15))/
-            (0.68 - (0.0014)*(d.main.humidity) + (1/a)));//体感温度の計算式
-        })
-        .interpolate("cardinal");
-
-      this.svg.append("path")
-        .attr("d", d3line(forecastlist))
-        .attr({
-          transform: "translate(0, 0)"})
-        .style("stroke-width", 3)
-        .style("stroke", "ff6699")
-        .style("fill", "none");
-
-      let circle = this.svg.selectAll("circle3")
-        .data(forecastlist)
-        .enter()
-        .append("circle")
-        .attr({
-          'cx': function(d){return xScale(d.dt);},
-          'cy': 0,
-          'r':3,
-          transform: "translate(0, 0)"
-        })
-        //点にカーソルをのせると表示
-        .on("mouseover", function(d){
-          let v = Math.pow(d.wind.speed, 0.75);
-          let a = 1.76 + 1.4*v;
-          let windchill = 37-(37-(d.main.temp-273.15))/
-            (0.68 - (0.0014)*(d.main.humidity) + (1/a));
-          windchill = Number(windchill).toFixed(1);
-          return tooltip
-            .style("visibility", "visible").text(windchill + "℃");})
-        .on("mousemove", function(d){
-          return tooltip.style("top", (event.pageY-20)+"px")
-            .style("left",(event.pageX+10)+"px");
-        })
-        .on("mouseout", function(d){
-          return tooltip.style("visibility", "hidden");
+      let data = [];
+      for(let d of forecastlist){
+        let v = Math.pow(d.wind.speed, 0.75);
+        let a = 1.76 + 1.4*v;
+        let windchill = 37-(37-(d.main.temp-273.15))/
+          (0.68 - (0.0014)*(d.main.humidity) + (1/a));
+        data.push({
+          "dt":d.dt,
+          "value":windchill
         });
-
-      circle.transition()
-        .delay(400)
-        .duration(1000)
-        .ease("bounce")
-        .attr("cy", function(d){
-          let v = Math.pow(d.wind.speed, 0.75);
-          let a = 1.76 + 1.4*v;
-          return yScale(37-(37-(d.main.temp-273.15))/
-            (0.68 - (0.0014)*(d.main.humidity) + (1/a)));
-        });
+      }
+      this.drowLine(this.svg,data,"#ff6699","cardinal");
+      // let d3line = d3.svg.line()
+      //   .x(function(d){return xScale(d.dt);})
+      //   .y(function(d){
+      //     let v = Math.pow(d.wind.speed, 0.75);//風速を0.75乗
+      //     let a = 1.76 + 1.4*v;
+      //     return yScale(37-(37-(d.main.temp-273.15))/
+      //       (0.68 - (0.0014)*(d.main.humidity) + (1/a)));//体感温度の計算式
+      //   })
+      //   .interpolate("cardinal");
+      //
+      // this.svg.append("path")
+      //   .attr("d", d3line(forecastlist))
+      //   .attr({
+      //     transform: "translate(0, 0)"})
+      //   .style("stroke-width", 3)
+      //   .style("stroke", "ff6699")
+      //   .style("fill", "none");
+      //
+      // let circle = this.svg.selectAll("circle3")
+      //   .data(forecastlist)
+      //   .enter()
+      //   .append("circle")
+      //   .attr({
+      //     'cx': function(d){return xScale(d.dt);},
+      //     'cy': 0,
+      //     'r':3,
+      //     transform: "translate(0, 0)"
+      //   })
+      //   //点にカーソルをのせると表示
+      //   .on("mouseover", function(d){
+      //     let v = Math.pow(d.wind.speed, 0.75);
+      //     let a = 1.76 + 1.4*v;
+      //     let windchill = 37-(37-(d.main.temp-273.15))/
+      //       (0.68 - (0.0014)*(d.main.humidity) + (1/a));
+      //     windchill = Number(windchill).toFixed(1);
+      //     return tooltip
+      //       .style("visibility", "visible").text(windchill + "℃");})
+      //   .on("mousemove", function(d){
+      //     return tooltip.style("top", (event.pageY-20)+"px")
+      //       .style("left",(event.pageX+10)+"px");
+      //   })
+      //   .on("mouseout", function(d){
+      //     return tooltip.style("visibility", "hidden");
+      //   });
+      //
+      // circle.transition()
+      //   .delay(400)
+      //   .duration(1000)
+      //   .ease("bounce")
+      //   .attr("cy", function(d){
+      //     let v = Math.pow(d.wind.speed, 0.75);
+      //     let a = 1.76 + 1.4*v;
+      //     return yScale(37-(37-(d.main.temp-273.15))/
+      //       (0.68 - (0.0014)*(d.main.humidity) + (1/a)));
+      //   });
     }
 
     //不快指数チェック
     if($("#chkFukai:checked").val()){
-      let d3line = d3.svg.line()
-        .x(function(d){return xScale(d.dt);})
-        .y(function(d){
-          return yScale(0.81*(d.main.temp - 273.15) +
-            0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3)+46.3);
-        })
-        .interpolate("cardinal");
-
-
-      this.svg.append("path")
-        .attr("d", d3line(forecastlist))
-        .attr({
-          transform: "translate(0, 0)"})
-        .style("stroke-width", 2)
-        .style("stroke", "#892706")
-        .style("fill", "none");
-
-
-      let circle = this.svg.selectAll("circle4")
-        .data(forecastlist)
-        .enter()
-        .append("circle")
-        .attr({
-          'cx': function(d){return xScale(d.dt);},
-          'cy': 0,
-          'r': 3,
-          transform: "translate(0, 0)"
-        })
-        .on("mouseover", function(d){
-          let v = Math.pow(d.wind.speed, 0.75);
-          let a = 1.76 + 1.4*v;
-          let di = 0.81*(d.main.temp - 273.15) +
-            0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3;
-          di = Number(di).toFixed(1);
-          return tooltip.style("visibility", "visible").text(di);})
-        .on("mousemove", function(d){
-          return tooltip.style("top", (event.pageY-20)+"px")
-            .style("left",(event.pageX+10)+"px");
-        })
-        .on("mouseout", function(d){
-          return tooltip.style("visibility", "hidden");
+      let data = [];
+      for(let d of forecastlist){
+        let di = 0.81*(d.main.temp - 273.15) +
+          0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3;
+        data.push({
+          "dt":d.dt,
+          "value":di
         });
-
-      circle.transition()
-        .delay(400)
-        .duration(1000)
-        .ease("bounce")
-        .attr("cy", function(d){
-          let v = Math.pow(d.wind.speed, 0.75);
-          let a = 1.76 + 1.4*v;
-          return yScale(
-              0.81*(d.main.temp - 273.15) +
-              0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3
-            );
-        });
+      }
+      this.drowLine(this.svg,data,"#892706","cardinal");
+      //
+      // let d3line = d3.svg.line()
+      //   .x(function(d){return xScale(d.dt);})
+      //   .y(function(d){
+      //     return yScale(0.81*(d.main.temp - 273.15) +
+      //       0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3)+46.3);
+      //   })
+      //   .interpolate("cardinal");
+      //
+      //
+      // this.svg.append("path")
+      //   .attr("d", d3line(forecastlist))
+      //   .attr({
+      //     transform: "translate(0, 0)"})
+      //   .style("stroke-width", 2)
+      //   .style("stroke", "#892706")
+      //   .style("fill", "none");
+      //
+      //
+      // let circle = this.svg.selectAll("circle4")
+      //   .data(forecastlist)
+      //   .enter()
+      //   .append("circle")
+      //   .attr({
+      //     'cx': function(d){return xScale(d.dt);},
+      //     'cy': 0,
+      //     'r': 3,
+      //     transform: "translate(0, 0)"
+      //   })
+      //   .on("mouseover", function(d){
+      //     let v = Math.pow(d.wind.speed, 0.75);
+      //     let a = 1.76 + 1.4*v;
+      //     let di = 0.81*(d.main.temp - 273.15) +
+      //       0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3;
+      //     di = Number(di).toFixed(1);
+      //     return tooltip.style("visibility", "visible").text(di);})
+      //   .on("mousemove", function(d){
+      //     return tooltip.style("top", (event.pageY-20)+"px")
+      //       .style("left",(event.pageX+10)+"px");
+      //   })
+      //   .on("mouseout", function(d){
+      //     return tooltip.style("visibility", "hidden");
+      //   });
+      //
+      // circle.transition()
+      //   .delay(400)
+      //   .duration(1000)
+      //   .ease("bounce")
+      //   .attr("cy", function(d){
+      //     let v = Math.pow(d.wind.speed, 0.75);
+      //     let a = 1.76 + 1.4*v;
+      //     return yScale(
+      //         0.81*(d.main.temp - 273.15) +
+      //         0.01*d.main.humidity*(0.99*(d.main.temp - 273.15) - 14.3) + 46.3
+      //       );
+      //   });
     }
   }
+  /*
+   *dataは
+   *[
+      dt:"時間",
+      value:"値"
+   *]
+   の形式
+   */
+  drowLine(tag,data,color,interpolate){
+    let margin = {top: 20, right: 20, bottom: 30, left: 40};
+    let w = 1000 - margin.left - margin.right;
+    let h = 700 - margin.top - margin.bottom;
+    let padding = 30;
 
+    let xScale = d3.scale.linear()
+      .domain([data[0].dt, data[data.length-1].dt])
+      .range([padding, w-margin.left]);
+
+    let yScale = d3.scale.linear()
+      .domain([-100, 100])
+      .range([h-padding, padding]);
+
+    let tooltip = d3.select("body").select("#tooltip");
+    //lineメソッドで線を用意している
+    let d3line = d3.svg.line()
+      .x(function(d){return xScale(d.dt);})
+      .y(function(d){return yScale(d.value);})
+      .interpolate(interpolate);//線の種類。cardinalは曲線
+
+    let g = tag.append("g");
+    g.append("path")
+      .attr("d", d3line(data))
+      .style("stroke-width", 2)
+      .style("stroke", color)
+      .style("fill", "none");
+
+    g.selectAll("circle")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr({
+        'cy': 0,
+      })
+      .on("mouseover", function(d){
+        return tooltip.style("visibility", "visible").text(d.value);})
+      .on("mousemove", function(){
+        return tooltip.style("top", (event.pageY-20)+"px")
+          .style("left",(event.pageX+10)+"px");
+      })
+      .on("mouseout", function(){
+        return tooltip.style("visibility", "hidden");
+      })
+      .transition()
+      .delay(400)
+      .duration(1000)
+      .ease("bounce")
+      .attr({
+        cx: function(d){return xScale(d.dt);},
+        cy:function(d){return yScale(d.value);},
+        r:3
+      });
+  }
   //サークルとグラフ線を消すだけのメソッド
   hideGraph(){
     d3.select("path").remove();
