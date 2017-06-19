@@ -84,15 +84,17 @@ fillとopacityで半透明な背景色。
 }
 
 span#tooltip{
-      position: absolute;
-      z-index: 10;
-      visibility: hidden;
-      padding: 0 5px;
-      border: 1px solid #000;
-      border-radius: 3px;
-      background-color: #333;
-      color: #fff;
-      font-size: 15px;
-      opacity: 0.8;
-    }
-
+  position: absolute;
+  z-index: 10;
+  visibility: hidden;
+  padding: 0 5px;
+  border: 1px solid #000;
+  border-radius: 3px;
+  background-color: #333;
+  color: #fff;
+  font-size: 15px;
+  opacity: 0.8;
+}
+.change-cursor:hover{
+    cursor: pointer;
+}

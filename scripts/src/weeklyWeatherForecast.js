@@ -116,7 +116,6 @@ export default class WeeklyWeatherForecast {
 
     //週間天気予報の天気アイコン表示
     this.image = weekly.append("image");
-      //on click 未実装
 
     this.image
       .on("click", function(d,i) {
@@ -124,12 +123,6 @@ export default class WeeklyWeatherForecast {
         oneDay.updateForecastList(d.dt);
         console.log(d.dt);
         oneDay.print();
-      })
-      .on("mouseover", function() {
-        d3.select(this).attr("cursor", "pointer");
-      })
-      .on("mouseout", function() {
-        d3.select(this).attr("cursor", "default");
       })
       .transition()
       .duration(1000)
@@ -143,6 +136,7 @@ export default class WeeklyWeatherForecast {
         });
       })
       .attr({
+        class: "change-cursor",
         href: function(d){
           return 'http://openweathermap.org/img/w/'+d.weather[0].icon+'.png';
         },
