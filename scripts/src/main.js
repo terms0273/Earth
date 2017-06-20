@@ -23,8 +23,8 @@ $(function() {
     }
   });
   //チェックボックスにチェック
-  $(":checkbox").click(()=>{
-    graph.init(weather.city);
+  $(":checkbox").click((e)=>{
+    graph.print(e.target.id);
   });
 
   //エンターボタンで検索動作
@@ -35,6 +35,7 @@ $(function() {
   });
   weather.send(weather.city);
   setTimeout(()=>{oneDay.init(weather);}, 500);
+  setTimeout(()=>{graph.init(weather.city);}, 500);
 
   //検索したときの動作
   function updateWeather(){
