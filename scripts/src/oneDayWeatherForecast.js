@@ -89,11 +89,13 @@ export default class OneDayWeatherForecast{
     date.setUTCHours(0);
     //21時から24時の間が次の日判定になってしまうため - 1をする
     let tempDate = new Date(this.json.list[0].dt * 1000 +
-                            this.weather.timeZone - 1);
+                            this.weather.timeZone);
     //今日か今日以外か
     if(date.getUTCDate() === tempDate.getUTCDate()){
       //表示しないアイコン数
-      this.notDataCount = Math.ceil(tempDate.getUTCHours() / 3 - 1);
+      this.notDataCount =　(tempDate.getUTCHours() -
+        new Date(this.weather.timeZone).getUTCHours() % 3) / 3 - 1;
+        
       //21時以降だと-1になってしまうので
       if(this.notDataCount == -1){
         this.notDataCount = 7;
