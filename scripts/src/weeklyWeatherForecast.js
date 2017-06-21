@@ -115,9 +115,7 @@ export default class WeeklyWeatherForecast {
       });
 
     //週間天気予報の天気アイコン表示
-    this.image = weekly.append("image");
-
-    this.image
+    weekly.append("image")
       .on("click", function(d,i) {
         console.log(d.dt);
         oneDay.updateForecastList(d.dt);
